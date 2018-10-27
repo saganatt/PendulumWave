@@ -58,7 +58,7 @@
 #define THRESHOLD         0.30f
 
 #define GRID_SIZE       64
-#define NUM_PARTICLES   1//16384
+#define NUM_PARTICLES   16384
 
 //const uint width = 640, height = 480;
 
@@ -771,7 +771,7 @@ main(int argc, char **argv)
 //    {
         if (numIterations <= 0)
         {
-            numIterations = 300;
+            numIterations = 10;//300;
         }
 
         runBenchmark(numIterations, argv[0]);

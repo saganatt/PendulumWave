@@ -98,7 +98,8 @@ struct integrate_functor
             pos.y = -1.0f + params.particleRadius;
             vel.y *= params.boundaryDamping;
         }
-
+	printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);
+	printf("Integrated new velocity: %f, %f, %f\n", vel.x, vel.y, vel.z);
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);
         thrust::get<1>(t) = make_float4(vel, velData.w);
@@ -332,11 +333,12 @@ void collideD(float4 *newVel,               // output: new velocity
     }
 
     // collide with cursor sphere
-    force += collideSpheres(pos, params.colliderPos, vel, make_float3(0.0f, 0.0f, 0.0f), params.particleRadius, params.colliderRadius, 0.0f);
+//    force += collideSpheres(pos, params.colliderPos, vel, make_float3(0.0f, 0.0f, 0.0f), params.particleRadius, params.colliderRadius, 0.0f);
 
     // write new velocity back to original unsorted location
     uint originalIndex = gridParticleIndex[index];
     newVel[originalIndex] = make_float4(vel + force, 0.0f);
+    printf("newVel after collisions: %f, %f, %f\n", newVel[originalIndex].x, newVel[originalIndex].y, newVel[originalIndex].z);
 }
 
 #endif

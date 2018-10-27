@@ -243,7 +243,7 @@ ParticleSystem::_finalize()
 void
 ParticleSystem::update(float deltaTime)
 {
-    printf("ParticleSystem::update\n");
+//    printf("ParticleSystem::update\n");
     assert(m_bInitialized);
 
     float *dPos;
