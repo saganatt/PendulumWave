@@ -21,6 +21,7 @@
 */
 
 // OpenGL Graphics includes
+/*
 #include <helper_gl.h>
 #if defined (WIN32)
 #include <GL/wglew.h>
@@ -34,7 +35,7 @@
 #else
 #include <GL/freeglut.h>
 #endif
-
+*/
 // CUDA runtime
 #include <cuda_runtime.h>
 
@@ -50,8 +51,8 @@
 #include <algorithm>
 
 #include "particleSystem.h"
-#include "render_particles.h"
-#include "paramgl.h"
+//#include "render_particles.h"
+//#include "paramgl.h"
 
 #define MAX_EPSILON_ERROR 5.00f
 #define THRESHOLD         0.30f
@@ -62,6 +63,7 @@
 const uint width = 640, height = 480;
 
 // view params
+/*
 int ox, oy;
 int buttonState = 0;
 float camera_trans[] = {0, 0, -3};
@@ -82,7 +84,7 @@ int demoCounter = 0;
 const int idleDelay = 2000;
 
 enum { M_VIEW = 0, M_MOVE };
-
+*/
 uint numParticles = 0;
 uint3 gridSize;
 int numIterations = 0; // run until exit
@@ -105,13 +107,13 @@ ParticleSystem *psystem = 0;
 static int fpsCount = 0;
 static int fpsLimit = 1;
 StopWatchInterface *timer = NULL;
-
+/*
 ParticleRenderer *renderer = 0;
 
 float modelView[16];
 
 ParamListGL *params;
-
+*/
 // Auto-Verification Code
 const int frameCheckNumber = 4;
 unsigned int frameCount = 0;
@@ -121,22 +123,22 @@ char        *g_refFile = NULL;
 const char *sSDKsample = "CUDA Particles Simulation";
 
 extern "C" void cudaInit(int argc, char **argv);
-extern "C" void cudaGLInit(int argc, char **argv);
+//extern "C" void cudaGLInit(int argc, char **argv);
 extern "C" void copyArrayFromDevice(void *host, const void *device, unsigned int vbo, int size);
 
 // initialize particle system
-void initParticleSystem(int numParticles, uint3 gridSize, bool bUseOpenGL)
+void initParticleSystem(int numParticles, uint3 gridSize/*, bool bUseOpenGL*/)
 {
-    psystem = new ParticleSystem(numParticles, gridSize, bUseOpenGL);
+    psystem = new ParticleSystem(numParticles, gridSize/*, bUseOpenGL*/);
     psystem->reset(ParticleSystem::CONFIG_GRID);
-
+/*
     if (bUseOpenGL)
     {
         renderer = new ParticleRenderer;
         renderer->setParticleRadius(psystem->getParticleRadius());
         renderer->setColorBuffer(psystem->getColorBuffer());
     }
-
+*/
     sdkCreateTimer(&timer);
 }
 
@@ -152,6 +154,7 @@ void cleanup()
 }
 
 // initialize OpenGL
+/*
 void initGL(int *argc, char **argv)
 {
     glutInit(argc, argv);
@@ -181,7 +184,7 @@ void initGL(int *argc, char **argv)
 
     glutReportErrors();
 }
-
+*/
 void runBenchmark(int iterations, char *exec_path)
 {
     printf("Run %u particles simulation for %d iterations...\n\n", numParticles, iterations);
@@ -241,8 +244,8 @@ void display()
     sdkStartTimer(&timer);
 
     // update the simulation
-    if (!bPause)
-    {
+//    if (!bPause)
+//    {
         psystem->setIterations(iterations);
         psystem->setDamping(damping);
         psystem->setGravity(-gravity);
@@ -252,7 +255,7 @@ void display()
         psystem->setCollideAttraction(collideAttraction);
 
         psystem->update(timestep);
-
+/*
         if (renderer)
         {
             renderer->setVertexBuffer(psystem->getCurrentReadBuffer(), psystem->getNumParticles());
@@ -304,12 +307,12 @@ void display()
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
     }
-
+*/
     sdkStopTimer(&timer);
-
+/*
     glutSwapBuffers();
     glutReportErrors();
-
+*/
     computeFPS();
 }
 
@@ -331,7 +334,7 @@ void addSphere()
     vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
     psystem->addSphere(0, pos, vel, ballr, pr*2.0f);
 }
-
+/*
 void reshape(int w, int h)
 {
     glMatrixMode(GL_PROJECTION);
@@ -497,10 +500,10 @@ void motion(int x, int y)
 
     glutPostRedisplay();
 }
-
+*/
 // commented out to remove unused parameter warnings in Linux
-void key(unsigned char key, int /*x*/, int /*y*/)
-{
+//void key(unsigned char key, int /*x*/, int /*y*/)
+/*{
     switch (key)
     {
         case ' ':
@@ -631,11 +634,11 @@ void idle(void)
 
     glutPostRedisplay();
 }
-
+*/
 void initParams()
 {
-    if (g_refFile)
-    {
+//    if (g_refFile)
+//    {
         timestep = 0.0f;
         damping = 0.0f;
         gravity = 0.0f;
@@ -644,7 +647,7 @@ void initParams()
         collideDamping = 0.0f;
         collideShear = 0.0f;
         collideAttraction = 0.0f;
-
+/*
     }
     else
     {
@@ -660,9 +663,9 @@ void initParams()
         params->AddParam(new Param<float>("collide damping", collideDamping, 0.0f, 0.1f, 0.001f, &collideDamping));
         params->AddParam(new Param<float>("collide shear"  , collideShear  , 0.0f, 0.1f, 0.001f, &collideShear));
         params->AddParam(new Param<float>("collide attract", collideAttraction, 0.0f, 0.1f, 0.001f, &collideAttraction));
-    }
+    }*/
 }
-
+/*
 void mainMenu(int i)
 {
     key((unsigned char) i, 0, 0);
@@ -683,7 +686,7 @@ void initMenus()
     glutAddMenuEntry("Quit (esc)", '\033');
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////////////
 // Program main
 ////////////////////////////////////////////////////////////////////////////////
@@ -691,7 +694,7 @@ int
 main(int argc, char **argv)
 {
 #if defined(__linux__)
-    setenv ("DISPLAY", ":0", 0);
+//    setenv ("DISPLAY", ":0", 0);
 #endif
 
     printf("%s Starting...\n\n", sSDKsample);
@@ -713,7 +716,7 @@ main(int argc, char **argv)
         {
             gridDim = getCmdLineArgumentInt(argc, (const char **) argv, "grid");
         }
-
+/*
         if (checkCmdLineFlag(argc, (const char **)argv, "file"))
         {
             getCmdLineArgumentString(argc, (const char **)argv, "file", &g_refFile);
@@ -721,7 +724,7 @@ main(int argc, char **argv)
             numIterations = 1;
         }
     }
-
+*/
     gridSize.x = gridSize.y = gridSize.z = gridDim;
     printf("grid: %d x %d x %d = %d cells\n", gridSize.x, gridSize.y, gridSize.z, gridSize.x*gridSize.y*gridSize.z);
     printf("particles: %d\n", numParticles);
@@ -733,11 +736,11 @@ main(int argc, char **argv)
         numIterations = getCmdLineArgumentInt(argc, (const char **) argv, "i");
     }
 
-    if (g_refFile)
-    {
+//    if (g_refFile)
+//    {
         cudaInit(argc, argv);
-    }
-    else
+//    }
+/*    else
     {
         if (checkCmdLineFlag(argc, (const char **)argv, "device"))
         {
@@ -752,25 +755,25 @@ main(int argc, char **argv)
         initGL(&argc, argv);
         cudaGLInit(argc, argv);
     }
-
+*/
     initParticleSystem(numParticles, gridSize, g_refFile==NULL);
     initParams();
-
+/*
     if (!g_refFile)
     {
         initMenus();
     }
-
-    if (benchmark || g_refFile)
-    {
+*/
+//    if (benchmark || g_refFile)
+//    {
         if (numIterations <= 0)
         {
             numIterations = 300;
         }
 
         runBenchmark(numIterations, argv[0]);
-    }
-    else
+//    }
+/*    else
     {
         glutDisplayFunc(display);
         glutReshapeFunc(reshape);
@@ -784,7 +787,7 @@ main(int argc, char **argv)
 
         glutMainLoop();
     }
-
+*/
     if (psystem)
     {
         delete psystem;

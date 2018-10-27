@@ -10,8 +10,8 @@
  */
 
 // OpenGL Graphics includes
-#define HELPERGL_EXTERN_GL_FUNC_IMPLEMENTATION
-#include <helper_gl.h>
+//#define HELPERGL_EXTERN_GL_FUNC_IMPLEMENTATION
+//#include <helper_gl.h>
 
 #include "particleSystem.h"
 #include "particleSystem.cuh"
@@ -33,9 +33,9 @@
 #define CUDART_PI_F         3.141592654f
 #endif
 
-ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenGL) :
+ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize/*, bool bUseOpenGL*/) :
     m_bInitialized(false),
-    m_bUseOpenGL(bUseOpenGL),
+//    m_bUseOpenGL(bUseOpenGL),
     m_numParticles(numParticles),
     m_hPos(0),
     m_hVel(0),
@@ -81,7 +81,7 @@ ParticleSystem::~ParticleSystem()
     _finalize();
     m_numParticles = 0;
 }
-
+/*
 uint
 ParticleSystem::createVBO(uint size)
 {
@@ -92,13 +92,14 @@ ParticleSystem::createVBO(uint size)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     return vbo;
 }
-
+*/
 inline float lerp(float a, float b, float t)
 {
     return a + t*(b-a);
 }
 
 // create a color ramp
+/*
 void colorRamp(float t, float *r)
 {
     const int ncolors = 7;
@@ -119,7 +120,7 @@ void colorRamp(float t, float *r)
     r[1] = lerp(c[i][1], c[i+1][1], u);
     r[2] = lerp(c[i][2], c[i+1][2], u);
 }
-
+*/
 void
 ParticleSystem::_initialize(int numParticles)
 {
@@ -141,16 +142,16 @@ ParticleSystem::_initialize(int numParticles)
 
     // allocate GPU data
     unsigned int memSize = sizeof(float) * 4 * m_numParticles;
-
+/*
     if (m_bUseOpenGL)
     {
         m_posVbo = createVBO(memSize);
         registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
     }
     else
-    {
+    {*/
         checkCudaErrors(cudaMalloc((void **)&m_cudaPosVBO, memSize)) ;
-    }
+//    }
 
     allocateArray((void **)&m_dVel, memSize);
 
@@ -162,7 +163,7 @@ ParticleSystem::_initialize(int numParticles)
 
     allocateArray((void **)&m_dCellStart, m_numGridCells*sizeof(uint));
     allocateArray((void **)&m_dCellEnd, m_numGridCells*sizeof(uint));
-
+/*
     if (m_bUseOpenGL)
     {
         m_colorVBO = createVBO(m_numParticles*4*sizeof(float));
@@ -193,7 +194,7 @@ ParticleSystem::_initialize(int numParticles)
     {
         checkCudaErrors(cudaMalloc((void **)&m_cudaColorVBO, sizeof(float)*numParticles*4));
     }
-
+*/
     sdkCreateTimer(&m_timer);
 
     setParameters(&m_params);
@@ -219,7 +220,7 @@ ParticleSystem::_finalize()
     freeArray(m_dGridParticleIndex);
     freeArray(m_dCellStart);
     freeArray(m_dCellEnd);
-
+/*
     if (m_bUseOpenGL)
     {
         unregisterGLBufferObject(m_cuda_colorvbo_resource);
@@ -228,10 +229,10 @@ ParticleSystem::_finalize()
         glDeleteBuffers(1, (const GLuint *)&m_colorVBO);
     }
     else
-    {
+    {*/
         checkCudaErrors(cudaFree(m_cudaPosVBO));
-        checkCudaErrors(cudaFree(m_cudaColorVBO));
-    }
+//        checkCudaErrors(cudaFree(m_cudaColorVBO));
+//    }
 }
 
 // step the simulation
@@ -241,15 +242,15 @@ ParticleSystem::update(float deltaTime)
     assert(m_bInitialized);
 
     float *dPos;
-
+/*
     if (m_bUseOpenGL)
     {
         dPos = (float *) mapGLBufferObject(&m_cuda_posvbo_resource);
     }
     else
-    {
+    {*/
         dPos = (float *) m_cudaPosVBO;
-    }
+//    }
 
     // update constants
     setParameters(&m_params);
@@ -297,10 +298,11 @@ ParticleSystem::update(float deltaTime)
         m_numGridCells);
 
     // note: do unmap at end here to avoid unnecessary graphics/CUDA context switch
+/*
     if (m_bUseOpenGL)
     {
         unmapGLBufferObject(m_cuda_posvbo_resource);
-    }
+    }*/
 }
 
 void
@@ -358,7 +360,7 @@ ParticleSystem::getArray(ParticleArray array)
         case POSITION:
             hdata = m_hPos;
             ddata = m_dPos;
-            cuda_vbo_resource = m_cuda_posvbo_resource;
+//            cuda_vbo_resource = m_cuda_posvbo_resource;
             break;
 
         case VELOCITY:
@@ -368,6 +370,7 @@ ParticleSystem::getArray(ParticleArray array)
     }
 
     copyArrayFromDevice(hdata, ddata, &cuda_vbo_resource, m_numParticles*4*sizeof(float));
+//  for empty vbo it's == checkCudaErrors(cudaMemcpy(hdata, ddata, m_numParticles*4*sizeof(float), cudaMemcpyDeviceToHost));
     return hdata;
 }
 
@@ -381,14 +384,15 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
         default:
         case POSITION:
             {
-                if (m_bUseOpenGL)
+		copyArrayToDevice(m_dPos, data, start*4*sizeof(float), count*4*sizeof(float));
+                /*if (m_bUseOpenGL)
                 {
                     unregisterGLBufferObject(m_cuda_posvbo_resource);
                     glBindBuffer(GL_ARRAY_BUFFER, m_posVbo);
                     glBufferSubData(GL_ARRAY_BUFFER, start*4*sizeof(float), count*4*sizeof(float), data);
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
                     registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
-                }
+                }*/
             }
             break;
 
