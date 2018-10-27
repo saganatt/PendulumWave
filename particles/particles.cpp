@@ -60,7 +60,7 @@
 #define GRID_SIZE       64
 #define NUM_PARTICLES   1//16384
 
-const uint width = 640, height = 480;
+//const uint width = 640, height = 480;
 
 // view params
 /*
@@ -94,10 +94,10 @@ float timestep = 0.5f;
 float damping = 1.0f;
 float gravity = 0.0003f;
 int iterations = 1;
-int ballr = 10;
+//int ballr = 10;
 
-float collideSpring = 0.5f;;
-float collideDamping = 0.02f;;
+float collideSpring = 0.5f;
+float collideDamping = 0.02f;
 float collideShear = 0.1f;
 float collideAttraction = 0.0f;
 
@@ -205,26 +205,26 @@ void runBenchmark(int iterations, char *exec_path)
     printf("particles, Throughput = %.4f KParticles/s, Time = %.5f s, Size = %u particles, NumDevsUsed = %u, Workgroup = %u\n",
            (1.0e-3 * numParticles)/fAvgSeconds, fAvgSeconds, numParticles, 1, 0);
 
-//    if (g_refFile)
-//    {
+/*    if (g_refFile)
+    {
         printf("\nChecking result...\n\n");
         float *hPos = (float *)malloc(sizeof(float)*4*psystem->getNumParticles());
         copyArrayFromDevice(hPos, psystem->getCudaPosVBO(),
                             0, sizeof(float)*4*psystem->getNumParticles());
 
-/*        sdkDumpBin((void *)hPos, sizeof(float)*4*psystem->getNumParticles(), "particles.bin");
+        sdkDumpBin((void *)hPos, sizeof(float)*4*psystem->getNumParticles(), "particles.bin");
 
         if (!sdkCompareBin2BinFloat("particles.bin", g_refFile, sizeof(float)*4*psystem->getNumParticles(),
                                     MAX_EPSILON_ERROR, THRESHOLD, exec_path))
         {
             g_TotalErrors++;
-        }*/
-//    }
+        }
+    }*/
 }
-
+/*
 void computeFPS()
 {
-//    frameCount++;
+    frameCount++;
     fpsCount++;
 
     if (fpsCount == fpsLimit)
@@ -233,14 +233,14 @@ void computeFPS()
         float ifps = 1.f / (sdkGetAverageTimerValue(&timer) / 1000.f);
         sprintf(fps, "CUDA Particles (%d particles): %3.1f fps", numParticles, ifps);
 
-//        glutSetWindowTitle(fps);
+        glutSetWindowTitle(fps);
         fpsCount = 0;
 
         fpsLimit = (int)MAX(ifps, 1.f);
         sdkResetTimer(&timer);
     }
 }
-/*
+
 void display()
 {
     sdkStartTimer(&timer);
@@ -322,7 +322,7 @@ inline float frand()
 {
     return rand() / (float) RAND_MAX;
 }
-
+/*
 void addSphere()
 {
     // inject a sphere of particles
@@ -336,7 +336,7 @@ void addSphere()
     vel[0] = vel[1] = vel[2] = vel[3] = 0.0f;
     psystem->addSphere(0, pos, vel, ballr, pr*2.0f);
 }
-/*
+
 void reshape(int w, int h)
 {
     glMatrixMode(GL_PROJECTION);
@@ -636,11 +636,11 @@ void idle(void)
 
     glutPostRedisplay();
 }
-*/
+
 void initParams()
 {
-//    if (g_refFile)
-//    {
+    if (g_refFile)
+    {
         printf("initParams()\n");
         timestep = 0.0f;
         damping = 0.0f;
@@ -650,7 +650,7 @@ void initParams()
         collideDamping = 0.0f;
         collideShear = 0.0f;
         collideAttraction = 0.0f;
-/*
+
     }
     else
     {
@@ -666,9 +666,9 @@ void initParams()
         params->AddParam(new Param<float>("collide damping", collideDamping, 0.0f, 0.1f, 0.001f, &collideDamping));
         params->AddParam(new Param<float>("collide shear"  , collideShear  , 0.0f, 0.1f, 0.001f, &collideShear));
         params->AddParam(new Param<float>("collide attract", collideAttraction, 0.0f, 0.1f, 0.001f, &collideAttraction));
-    }*/
+    }
 }
-/*
+
 void mainMenu(int i)
 {
     key((unsigned char) i, 0, 0);
@@ -760,7 +760,7 @@ main(int argc, char **argv)
     }
 */
     initParticleSystem(numParticles, gridSize/*, g_refFile==NULL*/);
-    initParams();
+//    initParams();
 /*
     if (!g_refFile)
     {

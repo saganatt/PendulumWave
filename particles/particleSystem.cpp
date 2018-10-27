@@ -393,7 +393,7 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
         default:
         case POSITION:
             {
-		copyArrayToDevice(m_dPos, data, start*4*sizeof(float), count*4*sizeof(float));
+		copyArrayToDevice(m_cudaPosVBO, data, start*4*sizeof(float), count*4*sizeof(float));
                 /*if (m_bUseOpenGL)
                 {
                     unregisterGLBufferObject(m_cuda_posvbo_resource);
@@ -490,7 +490,7 @@ ParticleSystem::reset(ParticleConfig config)
     setArray(POSITION, m_hPos, 0, m_numParticles);
     setArray(VELOCITY, m_hVel, 0, m_numParticles);
 }
-
+/*
 void
 ParticleSystem::addSphere(int start, float *pos, float *vel, int r, float spacing)
 {
@@ -528,4 +528,4 @@ ParticleSystem::addSphere(int start, float *pos, float *vel, int r, float spacin
 
     setArray(POSITION, m_hPos, start, index);
     setArray(VELOCITY, m_hVel, start, index);
-}
+}*/
