@@ -54,10 +54,10 @@ struct integrate_functor
         float3 pos = make_float3(posData.x, posData.y, posData.z);
         float3 vel = make_float3(velData.x, velData.y, velData.z);
         float3 len = make_float3(lenData.x, lenData.y, lenData.z);
-	float length = lenData.w;
+	float len_len = lenData.w;
 
 	// TODO: consider user trying to stretch the pendulum with the cursor
-	if(length != -1.0f) // if a pendulum
+	if(len_len != -1.0f) // if a pendulum
 	{
 	    float vel_val = length(vel);
 	
@@ -69,7 +69,7 @@ struct integrate_functor
 	    }
 	    else // pendulum breaks
 	    {
-	        length = -1.0f;
+	        len_len = -1.0f;
 	    }
 	}
 
@@ -124,7 +124,7 @@ struct integrate_functor
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);
         thrust::get<1>(t) = make_float4(vel, velData.w);
-        thrust::get<2>(t) = make_float4(len, length);
+        thrust::get<2>(t) = make_float4(len, len_len);
     }
 };
 
