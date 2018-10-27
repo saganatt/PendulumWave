@@ -53,12 +53,12 @@ struct integrate_functor
         volatile float4 lenData = thrust::get<2>(t);
         float3 pos = make_float3(posData.x, posData.y, posData.z);
         float3 vel = make_float3(velData.x, velData.y, velData.z);
+        float3 len = make_float3(lenData.x, lenData.y, lenData.z);
+	float length = lenData.w;
 
 	// TODO: consider user trying to stretch the pendulum with the cursor
-	if(lenData.w != -1.0f) // if a pendulum
+	if(length != -1.0f) // if a pendulum
 	{
-            float3 len = make_float3(lenData.x, lenData.y, lenData.z);
-	    float length = lenData.w;
 	    float vel_val = length(vel);
 	
 	    // tension is not a real force - does not have a fixed direction
