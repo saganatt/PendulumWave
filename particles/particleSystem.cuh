@@ -20,16 +20,12 @@ extern "C"
 
     void copyArrayFromDevice(void *host, const void *device, struct cudaGraphicsResource **cuda_vbo_resource, int size);
     void copyArrayToDevice(void *device, const void *host, int offset, int size);
-    void registerGLBufferObject(uint vbo, struct cudaGraphicsResource **cuda_vbo_resource);
-    void unregisterGLBufferObject(struct cudaGraphicsResource *cuda_vbo_resource);
-    void *mapGLBufferObject(struct cudaGraphicsResource **cuda_vbo_resource);
-    void unmapGLBufferObject(struct cudaGraphicsResource *cuda_vbo_resource);
-
 
     void setParameters(SimParams *hostParams);
 
     void integrateSystem(float *pos,
                          float *vel,
+			 float *len,
                          float deltaTime,
                          uint numParticles);
 
@@ -42,10 +38,12 @@ extern "C"
                                      uint  *cellEnd,
                                      float *sortedPos,
                                      float *sortedVel,
+				     float *sortedLen,
                                      uint  *gridParticleHash,
                                      uint  *gridParticleIndex,
                                      float *oldPos,
                                      float *oldVel,
+				     float *oldLen,
                                      uint   numParticles,
                                      uint   numCells);
 

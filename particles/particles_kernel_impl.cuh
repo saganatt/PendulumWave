@@ -26,6 +26,7 @@
 // textures for particle position and velocity
 texture<float4, 1, cudaReadModeElementType> oldPosTex;
 texture<float4, 1, cudaReadModeElementType> oldVelTex;
+texture<float4, 1, cudaReadModeElementType> oldLenTex;
 
 texture<uint, 1, cudaReadModeElementType> gridParticleHashTex;
 texture<uint, 1, cudaReadModeElementType> cellStartTex;
@@ -49,8 +50,28 @@ struct integrate_functor
     {
         volatile float4 posData = thrust::get<0>(t);
         volatile float4 velData = thrust::get<1>(t);
+        volatile float4 lenData = thrust::get<2>(t);
         float3 pos = make_float3(posData.x, posData.y, posData.z);
         float3 vel = make_float3(velData.x, velData.y, velData.z);
+
+	// TODO: consider user trying to stretch the pendulum with the cursor
+	if(lenData.w != -1.0f) // if a pendulum
+	{
+            float3 len = make_float3(lenData.x, lenData.y, lenData.z);
+	    float length = lenData.w;
+	    float vel_val = length(vel);
+	
+	    // tension is not a real force - does not have a fixed direction
+	    float tension_val = params.gravity.y + (vel_val * vel_val) / lenData.w;
+	    if(tension_val < params.breakingTension) // still attached
+	    {
+	        vel += normalize(len - pos) * tension_val * deltaTime;
+	    }
+	    else // pendulum breaks
+	    {
+	        length = -1.0f;
+	    }
+	}
 
         vel += params.gravity * deltaTime;
         vel *= params.globalDamping;
@@ -103,6 +124,7 @@ struct integrate_functor
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);
         thrust::get<1>(t) = make_float4(vel, velData.w);
+        thrust::get<2>(t) = make_float4(len, length);
     }
 };
 
@@ -154,10 +176,12 @@ void reorderDataAndFindCellStartD(uint   *cellStart,        // output: cell star
                                   uint   *cellEnd,          // output: cell end index
                                   float4 *sortedPos,        // output: sorted positions
                                   float4 *sortedVel,        // output: sorted velocities
+                                  float4 *sortedLen,        // output: sorted lengths
                                   uint   *gridParticleHash, // input: sorted grid hashes
                                   uint   *gridParticleIndex,// input: sorted particle indices
                                   float4 *oldPos,           // input: sorted position array
                                   float4 *oldVel,           // input: sorted velocity array
+                                  float4 *oldLen,           // input: sorted length array
                                   uint    numParticles)
 {
     extern __shared__ uint sharedHash[];    // blockSize + 1 elements
@@ -209,9 +233,11 @@ void reorderDataAndFindCellStartD(uint   *cellStart,        // output: cell star
         uint sortedIndex = gridParticleIndex[index];
         float4 pos = FETCH(oldPos, sortedIndex);       // macro does either global read or texture fetch
         float4 vel = FETCH(oldVel, sortedIndex);       // see particles_kernel.cuh
+	float4 len = FETCH(oldLen, sortedIndex);
 
         sortedPos[index] = pos;
         sortedVel[index] = vel;
+	sortedLen[index] = len;
     }
 
 
@@ -331,9 +357,6 @@ void collideD(float4 *newVel,               // output: new velocity
             }
         }
     }
-
-    // collide with cursor sphere
-//    force += collideSpheres(pos, params.colliderPos, vel, make_float3(0.0f, 0.0f, 0.0f), params.particleRadius, params.colliderRadius, 0.0f);
 
     // write new velocity back to original unsorted location
     uint originalIndex = gridParticleIndex[index];

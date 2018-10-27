@@ -23,20 +23,22 @@
 class ParticleSystem
 {
     public:
-        ParticleSystem(uint numParticles, uint3 gridSize/*, bool bUseOpenGL*/);
+        ParticleSystem(uint numParticles, uint3 gridSize, float tCycle, uint minOscillations);
         ~ParticleSystem();
 
         enum ParticleConfig
         {
             CONFIG_RANDOM,
             CONFIG_GRID,
-            _NUM_CONFIGS
+            _NUM_CONFIGS,
+	    CONFIG_PEND
         };
 
         enum ParticleArray
         {
             POSITION,
             VELOCITY,
+	    LENGTH
         };
 
         void update(float deltaTime);
@@ -49,25 +51,21 @@ class ParticleSystem
         {
             return m_numParticles;
         }
-/*
-        unsigned int getCurrentReadBuffer() const
-        {
-            return m_posVbo;
-        }
-        unsigned int getColorBuffer()       const
-        {
-            return m_colorVBO;
-        }
-*/
-        void *getCudaPosVBO()              const
+
+        void *getCudaPosVBO() const
         {
             return (void *)m_cudaPosVBO;
         }
-/*        void *getCudaColorVBO()            const
-        {
-            return (void *)m_cudaColorVBO;
-        }
-*/
+
+	float getTCycle() const
+	{
+	    return m_tCycle;
+	}
+	uint getMinOscillations() const
+	{
+	    return m_minOscillations;
+	}
+
         void dumpGrid();
         void dumpParticles(uint start, uint count);
 
@@ -102,22 +100,18 @@ class ParticleSystem
             m_params.attraction = x;
         }
 
-        void setColliderPos(float3 x)
-        {
-            m_params.colliderPos = x;
-        }
+	void setBreakingTension(float x)
+	{
+	    m_params.breakingTension = x;
+	}
+	float getBreakingTension()
+	{
+	    return m_params.breakingTension;
+	}
 
         float getParticleRadius()
         {
             return m_params.particleRadius;
-        }
-        float3 getColliderPos()
-        {
-            return m_params.colliderPos;
-        }
-        float getColliderRadius()
-        {
-            return m_params.colliderRadius;
         }
         uint3 getGridSize()
         {
@@ -132,11 +126,8 @@ class ParticleSystem
             return m_params.cellSize;
         }
 
-        //void addSphere(int index, float *pos, float *vel, int r, float spacing);
-
     protected: // methods
         ParticleSystem() {}
-//        uint createVBO(uint size);
 
         void _initialize(int numParticles);
         void _finalize();
@@ -147,9 +138,13 @@ class ParticleSystem
         bool m_bInitialized/*, m_bUseOpenGL*/;
         uint m_numParticles;
 
+	float m_tCycle;		    // time of 1 pendulum wave sequence
+	uint m_minOscillations;     // number of oscillations made by the longest pendulum
+
         // CPU data
         float *m_hPos;              // particle positions
         float *m_hVel;              // particle velocities
+	float *m_hLen;		    // particle strings positions and lengths (-1 == without string influence)
 
         uint  *m_hParticleHash;
         uint  *m_hCellStart;
@@ -158,9 +153,11 @@ class ParticleSystem
         // GPU data
         float *m_dPos;
         float *m_dVel;
+	float *m_dLen;
 
         float *m_dSortedPos;
         float *m_dSortedVel;
+	float *m_dSortenLen;
 
         // grid data for sorting method
         uint  *m_dGridParticleHash; // grid hash value for each particle
@@ -170,14 +167,7 @@ class ParticleSystem
 
         uint   m_gridSortBits;
 
-//        uint   m_posVbo;            // vertex buffer object for particle positions
-//        uint   m_colorVBO;          // vertex buffer object for colors
-
         float *m_cudaPosVBO;        // these are the CUDA deviceMem Pos
-//        float *m_cudaColorVBO;      // these are the CUDA deviceMem Color
-
-//        struct cudaGraphicsResource *m_cuda_posvbo_resource; // handles OpenGL-CUDA exchange
-//        struct cudaGraphicsResource *m_cuda_colorvbo_resource; // handles OpenGL-CUDA exchange
 
         // params
         SimParams m_params;
