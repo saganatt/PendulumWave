@@ -27,7 +27,7 @@
 #include <cuda_gl_interop.h>
 
 #include <helper_cuda.h>
-#include <helper_cuda_gl.h>
+//#include <helper_cuda_gl.h>
 
 #include <helper_functions.h>
 #include "thrust/device_ptr.h"
@@ -57,7 +57,7 @@ extern "C"
     void cudaGLInit(int argc, char **argv)
     {
         // use command-line specified CUDA device, otherwise use device with highest Gflops/s
-        findCudaGLDevice(argc, (const char **)argv);
+        //findCudaGLDevice(argc, (const char **)argv);
     }
 
     void allocateArray(void **devPtr, size_t size)

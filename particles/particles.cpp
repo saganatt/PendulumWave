@@ -42,7 +42,7 @@
 // CUDA utilities and system includes
 #include <helper_functions.h>
 #include <helper_cuda.h>    // includes cuda.h and cuda_runtime_api.h
-#include <helper_cuda_gl.h> // includes cuda_gl_interop.h// includes cuda_gl_interop.h
+//#include <helper_cuda_gl.h> // includes cuda_gl_interop.h// includes cuda_gl_interop.h
 
 // Includes
 #include <stdlib.h>
@@ -203,21 +203,21 @@ void runBenchmark(int iterations, char *exec_path)
     printf("particles, Throughput = %.4f KParticles/s, Time = %.5f s, Size = %u particles, NumDevsUsed = %u, Workgroup = %u\n",
            (1.0e-3 * numParticles)/fAvgSeconds, fAvgSeconds, numParticles, 1, 0);
 
-    if (g_refFile)
-    {
+//    if (g_refFile)
+//    {
         printf("\nChecking result...\n\n");
         float *hPos = (float *)malloc(sizeof(float)*4*psystem->getNumParticles());
         copyArrayFromDevice(hPos, psystem->getCudaPosVBO(),
                             0, sizeof(float)*4*psystem->getNumParticles());
 
-        sdkDumpBin((void *)hPos, sizeof(float)*4*psystem->getNumParticles(), "particles.bin");
+/*        sdkDumpBin((void *)hPos, sizeof(float)*4*psystem->getNumParticles(), "particles.bin");
 
         if (!sdkCompareBin2BinFloat("particles.bin", g_refFile, sizeof(float)*4*psystem->getNumParticles(),
                                     MAX_EPSILON_ERROR, THRESHOLD, exec_path))
         {
             g_TotalErrors++;
-        }
-    }
+        }*/
+//    }
 }
 
 void computeFPS()
@@ -231,7 +231,7 @@ void computeFPS()
         float ifps = 1.f / (sdkGetAverageTimerValue(&timer) / 1000.f);
         sprintf(fps, "CUDA Particles (%d particles): %3.1f fps", numParticles, ifps);
 
-        glutSetWindowTitle(fps);
+//        glutSetWindowTitle(fps);
         fpsCount = 0;
 
         fpsLimit = (int)MAX(ifps, 1.f);
@@ -722,9 +722,9 @@ main(int argc, char **argv)
             getCmdLineArgumentString(argc, (const char **)argv, "file", &g_refFile);
             fpsLimit = frameCheckNumber;
             numIterations = 1;
-        }
+        }*/
     }
-*/
+
     gridSize.x = gridSize.y = gridSize.z = gridDim;
     printf("grid: %d x %d x %d = %d cells\n", gridSize.x, gridSize.y, gridSize.z, gridSize.x*gridSize.y*gridSize.z);
     printf("particles: %d\n", numParticles);
@@ -756,7 +756,7 @@ main(int argc, char **argv)
         cudaGLInit(argc, argv);
     }
 */
-    initParticleSystem(numParticles, gridSize, g_refFile==NULL);
+    initParticleSystem(numParticles, gridSize/*, g_refFile==NULL*/);
     initParams();
 /*
     if (!g_refFile)
