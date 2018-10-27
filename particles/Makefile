@@ -34,7 +34,7 @@
 ################################################################################
 
 # Location of the CUDA Toolkit
-CUDA_PATH ?= "/opt/cuda"
+CUDA_PATH ?= /usr/local/cuda-8.0
 
 ##############################
 # start deprecated interface #
@@ -141,7 +141,7 @@ else ifneq ($(TARGET_ARCH),$(HOST_ARCH))
             export QNX_TARGET
             HOST_COMPILER ?= $(QNX_HOST)/usr/bin/aarch64-unknown-nto-qnx7.0.0-g++
         else ifeq ($(TARGET_OS), android)
-            HOST_COMPILER ?= aarch64-linux-android-clang++
+            HOST_COMPILER ?= aarch64-linux-android-g++
         endif
     else ifeq ($(TARGET_ARCH),ppc64le)
         HOST_COMPILER ?= powerpc64le-linux-gnu-g++
@@ -180,44 +180,6 @@ ifneq ($(TARGET_ARCH),$(HOST_ARCH))
             LDFLAGS += -rpath-link=$(TARGET_FS)/usr/lib/arm-linux-gnueabihf
         endif
     endif
-    ifeq ($(TARGET_ARCH)-$(TARGET_OS),aarch64-linux)
-        ifneq ($(TARGET_FS),)
-            GCCVERSIONLTEQ46 := $(shell expr `$(HOST_COMPILER) -dumpversion` \<= 4.6)
-            ifeq ($(GCCVERSIONLTEQ46),1)
-                CCFLAGS += --sysroot=$(TARGET_FS)
-            endif
-            LDFLAGS += --sysroot=$(TARGET_FS)
-            LDFLAGS += -rpath-link=$(TARGET_FS)/lib -L $(TARGET_FS)/lib
-            LDFLAGS += -rpath-link=$(TARGET_FS)/usr/lib -L $(TARGET_FS)/usr/lib
-            LDFLAGS += -rpath-link=$(TARGET_FS)/usr/lib/aarch64-linux-gnu -L $(TARGET_FS)/usr/lib/aarch64-linux-gnu
-            LDFLAGS += --unresolved-symbols=ignore-in-shared-libs
-            CCFLAGS += -isystem=$(TARGET_FS)/usr/include
-            CCFLAGS += -isystem=$(TARGET_FS)/usr/include/aarch64-linux-gnu
-        endif
-    endif
-endif
-
-ifeq ($(TARGET_OS),qnx)
-    CCFLAGS += -DWIN_INTERFACE_CUSTOM
-    LDFLAGS += -lsocket
-endif
-
-# Install directory of different arch
-CUDA_INSTALL_TARGET_DIR :=
-ifeq ($(TARGET_ARCH)-$(TARGET_OS),armv7l-linux)
-    CUDA_INSTALL_TARGET_DIR = targets/armv7-linux-gnueabihf/
-else ifeq ($(TARGET_ARCH)-$(TARGET_OS),aarch64-linux)
-    CUDA_INSTALL_TARGET_DIR = targets/aarch64-linux/
-else ifeq ($(TARGET_ARCH)-$(TARGET_OS),armv7l-android)
-    CUDA_INSTALL_TARGET_DIR = targets/armv7-linux-androideabi/
-else ifeq ($(TARGET_ARCH)-$(TARGET_OS),aarch64-android)
-    CUDA_INSTALL_TARGET_DIR = targets/aarch64-linux-androideabi/
-else ifeq ($(TARGET_ARCH)-$(TARGET_OS),armv7l-qnx)
-    CUDA_INSTALL_TARGET_DIR = targets/ARMv7-linux-QNX/
-else ifeq ($(TARGET_ARCH)-$(TARGET_OS),aarch64-qnx)
-    CUDA_INSTALL_TARGET_DIR = targets/aarch64-qnx/
-else ifeq ($(TARGET_ARCH),ppc64le)
-    CUDA_INSTALL_TARGET_DIR = targets/ppc64le-linux/
 endif
 
 # Debug build flags
@@ -258,11 +220,11 @@ ifeq ($(TARGET_OS),darwin)
  ALL_LDFLAGS += -Xlinker -framework -Xlinker GLUT
 else
  LIBRARIES += $(GLLINK)
- LIBRARIES += -lGL -lGLU -lglut
+ LIBRARIES += -lGL -lGLU -lX11 -lglut
 endif
 
 # Gencode arguments
-SMS ?= 30 35 37 50 52 60 61 70 75
+SMS ?= 20 30 35 37 50 52 60
 
 ifeq ($(SMS),)
 $(info >>> WARNING - no SM architectures have been specified - waiving sample <<<)

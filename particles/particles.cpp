@@ -41,6 +41,7 @@
 // CUDA utilities and system includes
 #include <helper_functions.h>
 #include <helper_cuda.h>    // includes cuda.h and cuda_runtime_api.h
+#include <helper_cuda_gl.h> // includes cuda_gl_interop.h// includes cuda_gl_interop.h
 
 // Includes
 #include <stdlib.h>
@@ -208,7 +209,7 @@ void runBenchmark(int iterations, char *exec_path)
 
         sdkDumpBin((void *)hPos, sizeof(float)*4*psystem->getNumParticles(), "particles.bin");
 
-        if (!sdkCompareBin2BinFloat("particles.bin", g_refFile, 4*psystem->getNumParticles(),
+        if (!sdkCompareBin2BinFloat("particles.bin", g_refFile, sizeof(float)*4*psystem->getNumParticles(),
                                     MAX_EPSILON_ERROR, THRESHOLD, exec_path))
         {
             g_TotalErrors++;
@@ -643,9 +644,11 @@ void initParams()
         collideDamping = 0.0f;
         collideShear = 0.0f;
         collideAttraction = 0.0f;
+
     }
     else
     {
+
         // create a new parameter list
         params = new ParamListGL("misc");
         params->AddParam(new Param<float>("time step", timestep, 0.0f, 1.0f, 0.01f, &timestep));
@@ -730,7 +733,7 @@ main(int argc, char **argv)
         numIterations = getCmdLineArgumentInt(argc, (const char **) argv, "i");
     }
 
-    if (benchmark || g_refFile)
+    if (g_refFile)
     {
         cudaInit(argc, argv);
     }
@@ -747,11 +750,16 @@ main(int argc, char **argv)
         }
 
         initGL(&argc, argv);
-        cudaInit(argc, argv);
+        cudaGLInit(argc, argv);
     }
 
-    initParticleSystem(numParticles, gridSize, !benchmark && g_refFile==NULL);
+    initParticleSystem(numParticles, gridSize, g_refFile==NULL);
     initParams();
+
+    if (!g_refFile)
+    {
+        initMenus();
+    }
 
     if (benchmark || g_refFile)
     {
@@ -764,11 +772,6 @@ main(int argc, char **argv)
     }
     else
     {
-        if (!g_refFile)
-        {
-            initMenus();
-        }
-
         glutDisplayFunc(display);
         glutReshapeFunc(reshape);
         glutMouseFunc(mouse);
