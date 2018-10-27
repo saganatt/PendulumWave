@@ -269,13 +269,13 @@ particleSystem_cuda.o:particleSystem_cuda.cu
 particles.o:particles.cpp
 	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-render_particles.o:render_particles.cpp
-	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+#render_particles.o:render_particles.cpp
+#	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-shaders.o:shaders.cpp
-	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
+#shaders.o:shaders.cpp
+#	$(EXEC) $(NVCC) $(INCLUDES) $(ALL_CCFLAGS) $(GENCODE_FLAGS) -o $@ -c $<
 
-particles: particleSystem.o particleSystem_cuda.o particles.o render_particles.o shaders.o
+particles: particleSystem.o particleSystem_cuda.o particles.o #render_particles.o shaders.o
 	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(LIBRARIES)
 	$(EXEC) mkdir -p ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
 	$(EXEC) cp $@ ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)
@@ -284,7 +284,7 @@ run: build
 	$(EXEC) ./particles
 
 clean:
-	rm -f particles particleSystem.o particleSystem_cuda.o particles.o render_particles.o shaders.o
+	rm -f particles particleSystem.o particleSystem_cuda.o particles.o #render_particles.o shaders.o
 	rm -rf ../../bin/$(TARGET_ARCH)/$(TARGET_OS)/$(BUILD_TYPE)/particles
 
 clobber: clean
