@@ -45,6 +45,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize/*, bool bUseOpe
     m_timer(NULL),
     m_solverIterations(1)
 {
+    printf("ParticleSystem constructor\n");
     m_numGridCells = m_gridSize.x*m_gridSize.y*m_gridSize.z;
     //    float3 worldSize = make_float3(2.0f, 2.0f, 2.0f);
 
@@ -78,6 +79,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize/*, bool bUseOpe
 
 ParticleSystem::~ParticleSystem()
 {
+    printf("ParticleSystem destructor\n");
     _finalize();
     m_numParticles = 0;
 }
@@ -92,14 +94,14 @@ ParticleSystem::createVBO(uint size)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     return vbo;
 }
-*/
+
 inline float lerp(float a, float b, float t)
 {
     return a + t*(b-a);
 }
 
 // create a color ramp
-/*
+
 void colorRamp(float t, float *r)
 {
     const int ncolors = 7;
@@ -124,6 +126,7 @@ void colorRamp(float t, float *r)
 void
 ParticleSystem::_initialize(int numParticles)
 {
+    printf("ParticleSystem::_initialize\n");
     assert(!m_bInitialized);
 
     m_numParticles = numParticles;
@@ -205,6 +208,7 @@ ParticleSystem::_initialize(int numParticles)
 void
 ParticleSystem::_finalize()
 {
+    printf("ParticleSystem::_finalize\n");
     assert(m_bInitialized);
 
     delete [] m_hPos;
@@ -239,6 +243,7 @@ ParticleSystem::_finalize()
 void
 ParticleSystem::update(float deltaTime)
 {
+    printf("ParticleSystem::update\n");
     assert(m_bInitialized);
 
     float *dPos;
@@ -308,6 +313,7 @@ ParticleSystem::update(float deltaTime)
 void
 ParticleSystem::dumpGrid()
 {
+    printf("ParticleSystem::dumpGrid\n");
     // dump grid information
     copyArrayFromDevice(m_hCellStart, m_dCellStart, 0, sizeof(uint)*m_numGridCells);
     copyArrayFromDevice(m_hCellEnd, m_dCellEnd, 0, sizeof(uint)*m_numGridCells);
@@ -333,6 +339,7 @@ ParticleSystem::dumpGrid()
 void
 ParticleSystem::dumpParticles(uint start, uint count)
 {
+    printf("ParticleSystem::dumpParticles\n");
     // debug
     copyArrayFromDevice(m_hPos, 0, 0/*&m_cuda_posvbo_resource*/, sizeof(float)*4*count);
     copyArrayFromDevice(m_hVel, m_dVel, 0, sizeof(float)*4*count);
@@ -348,6 +355,7 @@ ParticleSystem::dumpParticles(uint start, uint count)
 float *
 ParticleSystem::getArray(ParticleArray array)
 {
+    printf("ParticleSystem::getArray\n");
     assert(m_bInitialized);
 
     float *hdata = 0;
@@ -377,6 +385,7 @@ ParticleSystem::getArray(ParticleArray array)
 void
 ParticleSystem::setArray(ParticleArray array, const float *data, int start, int count)
 {
+    printf("ParticleSystem::setArray\n");
     assert(m_bInitialized);
 
     switch (array)
@@ -410,6 +419,7 @@ inline float frand()
 void
 ParticleSystem::initGrid(uint *size, float spacing, float jitter, uint numParticles)
 {
+    printf("ParticleSystem::initGrid\n");
     srand(1973);
 
     for (uint z=0; z<size[2]; z++)
@@ -440,6 +450,7 @@ ParticleSystem::initGrid(uint *size, float spacing, float jitter, uint numPartic
 void
 ParticleSystem::reset(ParticleConfig config)
 {
+    printf("ParticleSystem::reset\n");
     switch (config)
     {
         default:
@@ -483,6 +494,7 @@ ParticleSystem::reset(ParticleConfig config)
 void
 ParticleSystem::addSphere(int start, float *pos, float *vel, int r, float spacing)
 {
+    printf("ParticleSystem::addSphere\n");
     uint index = start;
 
     for (int z=-r; z<=r; z++)

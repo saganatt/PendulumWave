@@ -58,7 +58,7 @@
 #define THRESHOLD         0.30f
 
 #define GRID_SIZE       64
-#define NUM_PARTICLES   16384
+#define NUM_PARTICLES   1//16384
 
 const uint width = 640, height = 480;
 
@@ -115,10 +115,10 @@ float modelView[16];
 ParamListGL *params;
 */
 // Auto-Verification Code
-const int frameCheckNumber = 4;
-unsigned int frameCount = 0;
+//const int frameCheckNumber = 4;
+//unsigned int frameCount = 0;
 unsigned int g_TotalErrors = 0;
-char        *g_refFile = NULL;
+//char        *g_refFile = NULL;
 
 const char *sSDKsample = "CUDA Particles Simulation";
 
@@ -129,6 +129,7 @@ extern "C" void copyArrayFromDevice(void *host, const void *device, unsigned int
 // initialize particle system
 void initParticleSystem(int numParticles, uint3 gridSize/*, bool bUseOpenGL*/)
 {
+    printf("initParticleSystem\n");
     psystem = new ParticleSystem(numParticles, gridSize/*, bUseOpenGL*/);
     psystem->reset(ParticleSystem::CONFIG_GRID);
 /*
@@ -144,6 +145,7 @@ void initParticleSystem(int numParticles, uint3 gridSize/*, bool bUseOpenGL*/)
 
 void cleanup()
 {
+    printf("cleanup()\n");
     sdkDeleteTimer(&timer);
 
     if (psystem)
@@ -222,7 +224,7 @@ void runBenchmark(int iterations, char *exec_path)
 
 void computeFPS()
 {
-    frameCount++;
+//    frameCount++;
     fpsCount++;
 
     if (fpsCount == fpsLimit)
@@ -238,14 +240,14 @@ void computeFPS()
         sdkResetTimer(&timer);
     }
 }
-
+/*
 void display()
 {
     sdkStartTimer(&timer);
 
     // update the simulation
-//    if (!bPause)
-//    {
+    if (!bPause)
+    {
         psystem->setIterations(iterations);
         psystem->setDamping(damping);
         psystem->setGravity(-gravity);
@@ -255,7 +257,7 @@ void display()
         psystem->setCollideAttraction(collideAttraction);
 
         psystem->update(timestep);
-/*
+
         if (renderer)
         {
             renderer->setVertexBuffer(psystem->getCurrentReadBuffer(), psystem->getNumParticles());
@@ -307,15 +309,15 @@ void display()
         glDisable(GL_BLEND);
         glEnable(GL_DEPTH_TEST);
     }
-*/
+
     sdkStopTimer(&timer);
-/*
+
     glutSwapBuffers();
     glutReportErrors();
-*/
+
     computeFPS();
 }
-
+*/
 inline float frand()
 {
     return rand() / (float) RAND_MAX;
@@ -639,6 +641,7 @@ void initParams()
 {
 //    if (g_refFile)
 //    {
+        printf("initParams()\n");
         timestep = 0.0f;
         damping = 0.0f;
         gravity = 0.0f;
