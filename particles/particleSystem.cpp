@@ -33,11 +33,9 @@
 #define CUDART_PI_F         3.141592654f
 #endif
 
-ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, float tCycle, uint minOscillations) :
+ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize) :
     m_bInitialized(false),
     m_numParticles(numParticles),
-    m_tCycle(tCycle),
-    m_minOscillations(minOscillations),
     m_hPos(0),
     m_hVel(0),
     m_hLen(0),
@@ -71,7 +69,10 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, float tCycle, 
     m_params.shear = 0.1f;
     m_params.attraction = 0.0f;
     m_params.boundaryDamping = -0.5f;
+
     m_params.breakingTension = 10.0f;
+    m_params.tCycle = 600.0f;
+    m_params.minOscillations = 51;
 
     m_params.gravity = make_float3(0.0f, -1.0f, 0.0f);
     m_params.globalDamping = 1.0f;
@@ -401,7 +402,7 @@ ParticleSystem::reset(ParticleConfig config)
 	    {
                 int p = 0, v = 0, l = 0;
 		float pisq = powf(CUDART_PI_F, 2.0f);
-		float tsq = powf(m_tCycle, 2.0f);
+		float tsq = powf(m_params.tCycle, 2.0f);
 	        float g = -m_params.gravity.y;
 		float initzsq = powf(0.5f, 2.0f);
 		float initOffset = m_params.particleRadius * 1.0f;
@@ -412,7 +413,7 @@ ParticleSystem::reset(ParticleConfig config)
 		    m_hLen[l++] = -1.0f + initOffset + (float)i * spacing;
 		    m_hLen[l++] = 0.0f;
 		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = (g * tsq) / (4.0f * pisq * powf(m_minOscillations + i, 2.0f)); // length
+		    m_hLen[l++] = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f)); // length
                     m_hPos[p++] = m_hLen[p - 1];
                     m_hPos[p++] = powf(powf(m_hLen[i], 2.0f) - initzsq, 1.0f / 2.0f);
                     m_hPos[p++] = 0.5f;

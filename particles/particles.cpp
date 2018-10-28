@@ -43,12 +43,9 @@ uint3 gridSize;
 int numIterations = 0; // run until exit
 
 // simulation parameters
-float tCycle = 60.0f;
-uint minOscillations = 51;
 float particleRadius = 1.0f / 64.0f;
 
 float timestep = 0.5f;
-int iterations = 1;
 
 ParticleSystem *psystem = 0;
 
@@ -63,7 +60,7 @@ extern "C" void copyArrayFromDevice(void *host, const void *device, unsigned int
 void initParticleSystem(int numParticles, uint3 gridSize)
 {
     printf("initParticleSystem\n");
-    psystem = new ParticleSystem(numParticles, gridSize, tCycle, minOscillations);
+    psystem = new ParticleSystem(numParticles, gridSize);
     //psystem->reset(ParticleSystem::CONFIG_GRID);
     psystem->reset(ParticleSystem::CONFIG_PEND);
     sdkCreateTimer(&timer);
@@ -118,9 +115,6 @@ main(int argc, char **argv)
     numParticles = NUM_PARTICLES;
     uint gridDim = GRID_SIZE;
     numIterations = 0;
-
-    tCycle = 60.0f;
-    minOscillations = 51;
 
     if (argc > 1)
     {

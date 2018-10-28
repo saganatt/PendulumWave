@@ -23,7 +23,7 @@
 class ParticleSystem
 {
     public:
-        ParticleSystem(uint numParticles, uint3 gridSize, float tCycle, uint minOscillations);
+        ParticleSystem(uint numParticles, uint3 gridSize);
         ~ParticleSystem();
 
         enum ParticleConfig
@@ -56,15 +56,6 @@ class ParticleSystem
         {
             return (void *)m_cudaPosVBO;
         }
-
-	float getTCycle() const
-	{
-	    return m_tCycle;
-	}
-	uint getMinOscillations() const
-	{
-	    return m_minOscillations;
-	}
 
         void dumpGrid();
         void dumpParticles(uint start, uint count);
@@ -108,6 +99,22 @@ class ParticleSystem
 	{
 	    return m_params.breakingTension;
 	}
+	void setTCycle(float x)
+	{
+	    m_params.tCycle = x;
+	}
+	float getTCycle()
+	{
+	    return m_params.tCycle;
+	}
+	void setMinOscillations(uint x)
+	{
+	    m_params.minOscillations = x;
+	}
+	uint getMinOscillations()
+	{
+	    return m_params.minOscillations;
+	}
 
         float getParticleRadius()
         {
@@ -137,9 +144,6 @@ class ParticleSystem
     protected: // data
         bool m_bInitialized;
         uint m_numParticles;
-
-	float m_tCycle;		    // time of 1 pendulum wave sequence
-	uint m_minOscillations;     // number of oscillations made by the longest pendulum
 
         // CPU data
         float *m_hPos;              // particle positions

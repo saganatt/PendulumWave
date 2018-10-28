@@ -43,7 +43,10 @@ struct SimParams
     float shear;
     float attraction;
     float boundaryDamping;
+
     float breakingTension;
+    float tCycle;
+    uint minOscillations;
 };
 
 #endif
