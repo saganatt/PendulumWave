@@ -129,7 +129,7 @@ main(int argc, char **argv)
         }
     }
 
-    uint maxParticles = ((2.0f * particleRadius) / (3.0f * particleRadius)) + 1.0f;
+    uint maxParticles = floorf((2.0f - 2.0f * particleRadius) / (3.0f * particleRadius)) + 1.0f;
     if(numParticles > maxParticles)
     {
 	printf("particleRadius: %f\n", particleRadius);

@@ -74,7 +74,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize) :
     m_params.tCycle = 600.0f;
     m_params.minOscillations = 51;
 
-    m_params.gravity = make_float3(0.0f, -1.0f, 0.0f);
+    m_params.gravity = make_float3(0.0f, -0.0003f, 0.0f);
     m_params.globalDamping = 1.0f;
 
     _initialize(numParticles);
@@ -413,7 +413,7 @@ ParticleSystem::reset(ParticleConfig config)
 		    m_hLen[l++] = -1.0f + initOffset + (float)i * spacing;
 		    m_hLen[l++] = 0.0f;
 		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f)); // length
+		    m_hLen[l++] = 0.5f;//(g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f)); // length
                     m_hPos[p++] = m_hLen[p - 1];
                     m_hPos[p++] = powf(powf(m_hLen[i], 2.0f) - initzsq, 1.0f / 2.0f);
                     m_hPos[p++] = 0.5f;
