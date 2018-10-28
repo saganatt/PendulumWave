@@ -135,11 +135,12 @@ main(int argc, char **argv)
         }
     }
 
-    uint maxParticles = (2.0f * particleRadius) / (3.0f * particleRadius) + 1.0f;
+    uint maxParticles = ((2.0f * particleRadius) / (3.0f * particleRadius)) + 1.0f;
     if(numParticles > maxParticles)
     {
-	    numParticles = maxParticles;
-	    printf("max particles number exceeded, adopted max possible value = %d\n", maxParticles);
+	printf("particleRadius: %f\n", particleRadius);
+	printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, numParticles);
+	numParticles = maxParticles;
     }
 
     gridSize.x = gridSize.y = gridSize.z = gridDim;

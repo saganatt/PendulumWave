@@ -63,7 +63,7 @@ struct integrate_functor
 	    float vel_val = length(vel);
 	
 	    // tension is not a real force - does not have a fixed direction
-	    float tension_val = params.gravity.y + (vel_val * vel_val) / lenData.w;
+	    float tension_val = -params.gravity.y + (vel_val * vel_val) / lenData.w;
 	    printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
