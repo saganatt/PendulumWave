@@ -63,13 +63,17 @@ struct integrate_functor
 	
 	    // tension is not a real force - does not have a fixed direction
 	    float tension_val = params.gravity.y + (vel_val * vel_val) / lenData.w;
+	    printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
+		printf("Velocity before swing: (%f, %f, %f), position: (%f, %f, %f)\n", vel.x, vel.y, vel.z, pos.x, pos.y, pos.z);
 	        vel += normalize(len - pos) * tension_val * deltaTime;
+		printf("Velocity after swing: (%f, %f, %f)\n", vel.x, vel.y, vel.z);
 	    }
 	    else // pendulum breaks
 	    {
 	        len_len = -1.0f;
+		printf("Pendulum broke\n");
 	    }
 	}
 
