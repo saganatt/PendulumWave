@@ -64,7 +64,8 @@ void initParticleSystem(int numParticles, uint3 gridSize)
 {
     printf("initParticleSystem\n");
     psystem = new ParticleSystem(numParticles, gridSize, tCycle, minOscillations);
-    psystem->reset(ParticleSystem::CONFIG_GRID);
+    //psystem->reset(ParticleSystem::CONFIG_GRID);
+    psystem->reset(ParticleSystem::CONFIG_PEND);
     sdkCreateTimer(&timer);
 }
 
