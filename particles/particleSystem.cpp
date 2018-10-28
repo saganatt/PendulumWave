@@ -413,19 +413,19 @@ ParticleSystem::reset(ParticleConfig config)
                 for (uint i=0; i < m_numParticles; i++)
                 {
 		    len = 0.5f;
-		    startx += spacing;
 		    m_hLen[l++] = startx;
 		    m_hLen[l++] = 0.0f;
 		    m_hLen[l++] = 0.0f;
 		    m_hLen[l++] = len;//(g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f)); // length
                     m_hPos[p++] = startx;
-                    m_hPos[p++] = powf(powf(len, 2.0f) - initzsq, 1.0f / 2.0f);
+                    m_hPos[p++] = -powf(powf(len, 2.0f) - initzsq, 1.0f / 2.0f);
                     m_hPos[p++] = 0.2f;
                     m_hPos[p++] = 1.0f; // radius
                     m_hVel[v++] = 0.0f;
                     m_hVel[v++] = 0.0f;
                     m_hVel[v++] = 0.0f;
                     m_hVel[v++] = 0.0f;
+		    startx += spacing;
                 }
 	    }
 	    break;
