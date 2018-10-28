@@ -135,7 +135,7 @@ class ParticleSystem
         void initGrid(uint *size, float spacing, float jitter, uint numParticles);
 
     protected: // data
-        bool m_bInitialized/*, m_bUseOpenGL*/;
+        bool m_bInitialized;
         uint m_numParticles;
 
 	float m_tCycle;		    // time of 1 pendulum wave sequence

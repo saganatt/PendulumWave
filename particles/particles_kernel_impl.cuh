@@ -55,6 +55,7 @@ struct integrate_functor
         float3 vel = make_float3(velData.x, velData.y, velData.z);
         float3 len = make_float3(lenData.x, lenData.y, lenData.z);
 	float len_len = lenData.w;
+	printf("Pendulum length: %f\n", len_len);
 
 	// TODO: consider user trying to stretch the pendulum with the cursor
 	if(len_len != -1.0f) // if a pendulum
