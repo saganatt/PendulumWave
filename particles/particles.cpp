@@ -36,7 +36,7 @@
 #include "particleSystem.h"
 
 #define GRID_SIZE       64
-#define NUM_PARTICLES   16
+#define NUM_PARTICLES   1
 
 uint numParticles = 0;
 uint3 gridSize;
