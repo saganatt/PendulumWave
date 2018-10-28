@@ -405,9 +405,9 @@ ParticleSystem::reset(ParticleConfig config)
 		float tsq = powf(m_params.tCycle, 2.0f);
 	        float g = -m_params.gravity.y;
 		float len;
-		float startx = initOffset - 1.0f;
 		float initzsq = powf(0.2f, 2.0f);
 		float initOffset = m_params.particleRadius * 1.0f;
+		float startx = initOffset - 1.0f;
 		float spacing = m_params.particleRadius * 3.0f;
 
                 for (uint i=0; i < m_numParticles; i++)
