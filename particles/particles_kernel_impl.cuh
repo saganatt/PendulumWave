@@ -57,8 +57,6 @@ struct integrate_functor
 	float len_len = lenData.w;
 	printf("Pendulum length: %f\n", len_len);
 
-        vel += params.gravity * deltaTime;
-
 	// TODO: consider user trying to stretch the pendulum with the cursor
 	if(len_len != -1.0f) // if a pendulum
 	{
@@ -81,6 +79,7 @@ struct integrate_functor
 	    }
 	}
 
+        vel += params.gravity * deltaTime;
         vel *= params.globalDamping;
 
         // new position = old position + velocity * deltaTime
