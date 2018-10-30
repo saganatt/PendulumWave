@@ -74,7 +74,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize) :
     m_params.tCycle = 60000.0f;
     m_params.minOscillations = 51;
 
-    m_params.gravity = make_float3(0.0f, -3.0f, 0.0f);
+    m_params.gravity = make_float3(0.0f, -0.3f, 0.0f);
     m_params.globalDamping = 1.0f;
 
     _initialize(numParticles);
