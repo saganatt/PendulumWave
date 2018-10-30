@@ -126,7 +126,9 @@ struct integrate_functor
             pos.y = -1.0f + params.particleRadius;
             vel.y *= params.boundaryDamping;
         }
+	float proper_y = powf((powf(len_len, 2.0f) - powf(pos.z, 2.0f)), 1.0f / 2.0f);
 	printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);
+	printf("Supposed y for given z: %f\n", proper_y);
 	printf("Integrated new velocity: %f, %f, %f\n", vel.x, vel.y, vel.z);
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);

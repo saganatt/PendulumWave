@@ -45,7 +45,7 @@ int numIterations = 0; // run until exit
 // simulation parameters
 float particleRadius = 1.0f / 64.0f;
 
-float timestep = 0.1f;
+float timestep = 0.01f;
 
 ParticleSystem *psystem = 0;
 
