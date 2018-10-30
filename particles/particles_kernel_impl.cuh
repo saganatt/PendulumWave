@@ -63,8 +63,8 @@ struct integrate_functor
 	    float vel_val = length(vel);
 	
 	    // tension is not a real force - does not have a fixed direction
-	    // magnitude = mgsin(theta) + mv2 / L => (g(z - zeq) + v2) / L
-	    float tension_val = (-params.gravity.y * (pos.z - len.z) + powf(vel_val, 2.0f)) / lenData.w;
+	    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g(y2-y0)) / L
+	    float tension_val = (-params.gravity.y * (pos.y - len.y) + powf(vel_val, 2.0f)) / lenData.w;
 	    printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {

@@ -71,7 +71,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize) :
     m_params.boundaryDamping = -0.5f;
 
     m_params.breakingTension = 10.0f;
-    m_params.tCycle = 600.0f;
+    m_params.tCycle = 60000.0f;
     m_params.minOscillations = 51;
 
     m_params.gravity = make_float3(0.0f, -0.0003f, 0.0f);

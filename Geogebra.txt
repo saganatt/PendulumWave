@@ -1,11 +1,11 @@
 Geogebra formulas:
 
-l1=Sequence(Segment((i,0),(i,4sin(2π (f+(1)/(60)i)t))),i,0,15,1)
+l1=Sequence(Segment((i,0),(i,0.5sin(2π (f+(1)/(60)i)t))),i,0,15,1)
 Draws lines of pendulums
 Total cycle = 60 s dla f = 1, pendulum difference of 1/60 f (artificial length difference)
 Optimal animation: f = 1, t od 0 do 60
 
-l3=Sequence((i,4sin(2π (f+(1)/(60)i)t)),i,0,15,1)
+l3=Sequence((i,0.5sin(2π (f+(1)/(60)i)t)),i,0,15,1)
 Draws pendulum bobs
 
 l2=Sequence((m,-10((b)/(2π (a+m)))^(2)),m,0,15,1)
