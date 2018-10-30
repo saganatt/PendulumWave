@@ -405,7 +405,7 @@ ParticleSystem::reset(ParticleConfig config)
 		float tsq = powf(m_params.tCycle, 2.0f);
 	        float g = -m_params.gravity.y;
 		float len;
-		float initzsq = powf(0.2f, 2.0f);
+		float initzsq = powf(0.05f, 2.0f);
 		float initOffset = m_params.particleRadius * 1.0f;
 		float startx = initOffset - 1.0f;
 		float spacing = m_params.particleRadius * 3.0f;
@@ -419,7 +419,7 @@ ParticleSystem::reset(ParticleConfig config)
 		    m_hLen[l++] = len;//(g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f)); // length
                     m_hPos[p++] = startx;
                     m_hPos[p++] = -powf(powf(len, 2.0f) - initzsq, 1.0f / 2.0f);
-                    m_hPos[p++] = 0.2f;
+                    m_hPos[p++] = 0.05f;
                     m_hPos[p++] = 1.0f; // radius
                     m_hVel[v++] = 0.0f;
                     m_hVel[v++] = 0.0f;
