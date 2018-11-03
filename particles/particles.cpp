@@ -91,7 +91,7 @@ bool useOpenGL = false;
 // simulation parameters
 float timestep = 0.01f;
 float damping = 1.0f;
-float gravity = 0.0003f;
+float gravity = 0.3f;
 int iterations = 1;
 int ballr = 10;
 float particleRadius = 1.0f / 64.0f;
@@ -563,10 +563,18 @@ void key(unsigned char key, int /*x*/, int /*y*/)
             break;
 
         case '3':
-            addSphere();
+            psystem->reset(ParticleSystem::CONFIG_PEND);
             break;
 
         case '4':
+            psystem->reset(ParticleSystem::CONFIG_NEWTON);
+            break;
+
+        case '5':
+            addSphere();
+            break;
+
+        case '6':
             {
                 // shoot ball from camera
                 float pr = psystem->getParticleRadius();
@@ -652,7 +660,6 @@ void initParams()
     }
     else if(useOpenGL)
     {
-
         // create a new parameter list
         params = new ParamListGL("misc");
         params->AddParam(new Param<float>("time step", timestep, 0.0f, 1.0f, 0.01f, &timestep));
@@ -677,7 +684,9 @@ void initMenus()
     glutCreateMenu(mainMenu);
     glutAddMenuEntry("Reset block [1]", '1');
     glutAddMenuEntry("Reset random [2]", '2');
-    glutAddMenuEntry("Add sphere [3]", '3');
+    glutAddMenuEntry("Reset pendulum wave [3]", '3');
+    glutAddMenuEntry("Reset Newton craddle [4]", '4');
+    glutAddMenuEntry("Add sphere [5]", '5');
     glutAddMenuEntry("View mode [v]", 'v');
     glutAddMenuEntry("Move cursor mode [m]", 'm');
     glutAddMenuEntry("Toggle point rendering [p]", 'p');
@@ -730,7 +739,6 @@ main(int argc, char **argv)
     uint maxParticles = floorf((2.0f - 2.0f * particleRadius) / (3.0f * particleRadius)) + 1.0f;
     if(numParticles > maxParticles)
     {
-	printf("particleRadius: %f\n", particleRadius);
 	printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, numParticles);
 	numParticles = maxParticles;
     }

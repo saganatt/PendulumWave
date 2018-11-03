@@ -31,6 +31,7 @@ class ParticleSystem
             CONFIG_RANDOM,
             CONFIG_GRID,
 	    CONFIG_PEND,
+	    CONFIG_NEWTON,
             _NUM_CONFIGS
         };
 

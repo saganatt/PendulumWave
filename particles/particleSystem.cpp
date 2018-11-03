@@ -509,7 +509,17 @@ ParticleSystem::reset(ParticleConfig config)
             break;
 
 	case CONFIG_PEND:
-	    {
+	    {		
+		float initOffset = m_params.particleRadius * 1.0f;
+		float startx = initOffset - 1.0f;
+		float spacing = m_params.particleRadius * 3.0f;
+	        uint maxParticles = floorf((2.0f - 2.0f * initOffset) / spacing) + 1.0f;
+	        if(m_numParticles > maxParticles)
+	        {
+		    printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, m_numParticles);
+		    m_numParticles = maxParticles;
+	        }
+
                 int p = 0, v = 0, l = 0;
 		float pisq = powf(CUDART_PI_F, 2.0f);
 		float tsq = powf(m_params.tCycle, 2.0f);
@@ -517,9 +527,6 @@ ParticleSystem::reset(ParticleConfig config)
 		float len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + m_numParticles - 1, 2.0f));
 		float maxDisplacement = len / 9.0f; // small angle approximation works for angles <= 1/9 rad
 		float maxDisplacementSq = powf(maxDisplacement, 2.0f);
-		float initOffset = m_params.particleRadius * 1.0f;
-		float startx = initOffset - 1.0f;
-		float spacing = m_params.particleRadius * 3.0f;
 
                 for (uint i=0; i < m_numParticles; i++)
                 {
@@ -537,6 +544,54 @@ ParticleSystem::reset(ParticleConfig config)
                     m_hVel[v++] = 0.0f;
                     m_hVel[v++] = 0.0f;
 		    startx += spacing;
+                }
+	    }
+	    break;
+
+	case CONFIG_NEWTON:
+	    {
+		float initOffset = len;
+		float startx = initOffset - 1.0f;
+		float spacing = m_params.particleRadius * 2.0f;
+	        uint maxParticles = floorf((2.0f - 2.0f * initOffset) / spacing) + 1.0f;
+	        if(m_numParticles > maxParticles)
+	        {
+		    printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, m_numParticles);
+		    m_numParticles = maxParticles;
+	        }
+
+                int p = 0, v = 0, l = 0;
+		float len = 0.1f;
+
+		// The pendulum that starts the craddle
+		m_hLen[l++] = startx;
+		m_hLen[l++] = 0.0f;
+		m_hLen[l++] = 0.0f;
+		m_hLen[l++] = len; // length
+	        m_hPos[p++] = len / 2.0f;
+	        m_hPos[p++] = (powf(3.0f, 1.0f / 2.0f) / 2.0f) * len;
+	        m_hPos[p++] = 0.0f;
+	        m_hPos[p++] = 1.0f; // radius
+	        m_hVel[v++] = 0.0f;
+	        m_hVel[v++] = 0.0f;
+	        m_hVel[v++] = 0.0f;
+	        m_hVel[v++] = 0.0f;
+
+                for (uint i=1; i < m_numParticles; i++)
+                {
+		    startx += spacing;
+		    m_hLen[l++] = startx;
+		    m_hLen[l++] = 0.0f;
+		    m_hLen[l++] = 0.0f;
+		    m_hLen[l++] = len;// length
+                    m_hPos[p++] = startx;
+                    m_hPos[p++] = -len;
+                    m_hPos[p++] = 0.0f;
+                    m_hPos[p++] = 1.0f; // radius
+                    m_hVel[v++] = 0.0f;
+                    m_hVel[v++] = 0.0f;
+                    m_hVel[v++] = 0.0f;
+                    m_hVel[v++] = 0.0f;
                 }
 	    }
 	    break;
