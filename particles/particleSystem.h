@@ -23,15 +23,15 @@
 class ParticleSystem
 {
     public:
-        ParticleSystem(uint numParticles, uint3 gridSize);
+        ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenGL);
         ~ParticleSystem();
 
         enum ParticleConfig
         {
             CONFIG_RANDOM,
             CONFIG_GRID,
-            _NUM_CONFIGS,
-	    CONFIG_PEND
+	    CONFIG_PEND,
+            _NUM_CONFIGS
         };
 
         enum ParticleArray
@@ -52,9 +52,22 @@ class ParticleSystem
             return m_numParticles;
         }
 
-        void *getCudaPosVBO() const
+        unsigned int getCurrentReadBuffer() const
+        {
+            return m_posVbo;
+        }
+        unsigned int getColorBuffer()       const
+        {
+            return m_colorVBO;
+        }
+
+        void *getCudaPosVBO()              const
         {
             return (void *)m_cudaPosVBO;
+        }
+        void *getCudaColorVBO()            const
+        {
+            return (void *)m_cudaColorVBO;
         }
 
         void dumpGrid();
@@ -116,9 +129,22 @@ class ParticleSystem
 	    return m_params.minOscillations;
 	}
 
+        void setColliderPos(float3 x)
+        {
+            m_params.colliderPos = x;
+        }
+
         float getParticleRadius()
         {
             return m_params.particleRadius;
+        }
+        float3 getColliderPos()
+        {
+            return m_params.colliderPos;
+        }
+        float getColliderRadius()
+        {
+            return m_params.colliderRadius;
         }
         uint3 getGridSize()
         {
@@ -133,8 +159,11 @@ class ParticleSystem
             return m_params.cellSize;
         }
 
+        void addSphere(int index, float *pos, float *vel, int r, float spacing);
+
     protected: // methods
         ParticleSystem() {}
+        uint createVBO(uint size);
 
         void _initialize(int numParticles);
         void _finalize();
@@ -142,7 +171,7 @@ class ParticleSystem
         void initGrid(uint *size, float spacing, float jitter, uint numParticles);
 
     protected: // data
-        bool m_bInitialized;
+        bool m_bInitialized, m_bUseOpenGL;
         uint m_numParticles;
 
         // CPU data
@@ -171,7 +200,14 @@ class ParticleSystem
 
         uint   m_gridSortBits;
 
+        uint   m_posVbo;            // vertex buffer object for particle positions
+        uint   m_colorVBO;          // vertex buffer object for colors
+
         float *m_cudaPosVBO;        // these are the CUDA deviceMem Pos
+        float *m_cudaColorVBO;      // these are the CUDA deviceMem Color
+
+        struct cudaGraphicsResource *m_cuda_posvbo_resource; // handles OpenGL-CUDA exchange
+        struct cudaGraphicsResource *m_cuda_colorvbo_resource; // handles OpenGL-CUDA exchange
 
         // params
         SimParams m_params;

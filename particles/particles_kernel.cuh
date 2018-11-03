@@ -26,6 +26,9 @@ typedef unsigned int uint;
 // simulation parameters
 struct SimParams
 {
+    float3 colliderPos;
+    float  colliderRadius;
+
     float3 gravity;
     float globalDamping;
     float particleRadius;

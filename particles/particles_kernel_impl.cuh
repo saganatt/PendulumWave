@@ -366,6 +366,9 @@ void collideD(float4 *newVel,               // output: new velocity
         }
     }
 
+    // collide with cursor sphere
+    force += collideSpheres(pos, params.colliderPos, vel, make_float3(0.0f, 0.0f, 0.0f), params.particleRadius, params.colliderRadius, 0.0f);
+
     // write new velocity back to original unsorted location
     uint originalIndex = gridParticleIndex[index];
     newVel[originalIndex] = make_float4(vel + force, 0.0f);
