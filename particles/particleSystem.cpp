@@ -550,6 +550,7 @@ ParticleSystem::reset(ParticleConfig config)
 
 	case CONFIG_NEWTON:
 	    {
+		float len = 0.1f;
 		float initOffset = len;
 		float startx = initOffset - 1.0f;
 		float spacing = m_params.particleRadius * 2.0f;
@@ -559,9 +560,7 @@ ParticleSystem::reset(ParticleConfig config)
 		    printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, m_numParticles);
 		    m_numParticles = maxParticles;
 	        }
-
                 int p = 0, v = 0, l = 0;
-		float len = 0.1f;
 
 		// The pendulum that starts the craddle
 		m_hLen[l++] = startx;

@@ -131,7 +131,8 @@ void initParticleSystem(int numParticles, uint3 gridSize, bool bUseOpenGL)
 {
     psystem = new ParticleSystem(numParticles, gridSize, bUseOpenGL);
     //psystem->reset(ParticleSystem::CONFIG_GRID);
-    psystem->reset(ParticleSystem::CONFIG_PEND);
+    //psystem->reset(ParticleSystem::CONFIG_PEND);
+    psystem->reset(ParticleSystem::CONFIG_NEWTON);
 
     if (bUseOpenGL)
     {
