@@ -131,8 +131,8 @@ void initParticleSystem(int numParticles, uint3 gridSize, bool bUseOpenGL)
 {
     psystem = new ParticleSystem(numParticles, gridSize, bUseOpenGL);
     //psystem->reset(ParticleSystem::CONFIG_GRID);
-    //psystem->reset(ParticleSystem::CONFIG_PEND);
-    psystem->reset(ParticleSystem::CONFIG_NEWTON);
+    psystem->reset(ParticleSystem::CONFIG_PEND);
+    //psystem->reset(ParticleSystem::CONFIG_NEWTON);
 
     if (bUseOpenGL)
     {
@@ -715,7 +715,7 @@ main(int argc, char **argv)
     numParticles = NUM_PARTICLES;
     uint gridDim = GRID_SIZE;
     numIterations = 0;
-    useOpenGL = false;
+    useOpenGL = true;
 
     if (argc > 1)
     {
@@ -749,7 +749,7 @@ main(int argc, char **argv)
     printf("particles: %d\n", numParticles);
 
     bool benchmark = checkCmdLineFlag(argc, (const char **) argv, "benchmark") != 0;
-    useOpenGL = checkCmdLineFlag(argc, (const char **) argv, "useOpenGL") != 0;
+    //useOpenGL = checkCmdLineFlag(argc, (const char **) argv, "useOpenGL") != 0;
 
     if (checkCmdLineFlag(argc, (const char **) argv, "i"))
     {

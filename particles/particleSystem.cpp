@@ -72,11 +72,11 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.attraction = 0.0f;
     m_params.boundaryDamping = -0.5f;
 
-    m_params.breakingTension = 10.0f;
-    m_params.tCycle = 6.0f;
-    m_params.minOscillations = 51;
+    m_params.breakingTension = 1.0f;
+    m_params.tCycle = 600.0f;
+    m_params.minOscillations = 5;
 
-    m_params.gravity = make_float3(0.0f, -0.3f, 0.0f);
+    m_params.gravity = make_float3(0.0f, -0.003f, 0.0f);
     m_params.globalDamping = 1.0f;
 
     _initialize(numParticles);
@@ -525,19 +525,19 @@ ParticleSystem::reset(ParticleConfig config)
 		float tsq = powf(m_params.tCycle, 2.0f);
 	        float g = -m_params.gravity.y;
 		float len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + m_numParticles - 1, 2.0f));
-		float maxDisplacement = len / 9.0f; // small angle approximation works for angles <= 1/9 rad
+		float maxDisplacement = len / 7.0f; // small angle approximation works for angles <= 1/9 rad
 		float maxDisplacementSq = powf(maxDisplacement, 2.0f);
 
                 for (uint i=0; i < m_numParticles; i++)
                 {
 		    len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f));
 		    m_hLen[l++] = startx;
+		    m_hLen[l++] = 1.0f;
 		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = len;// // length
+		    m_hLen[l++] = len;// length
                     m_hPos[p++] = startx;
                     m_hPos[p++] = -powf(powf(len, 2.0f) - maxDisplacementSq, 1.0f / 2.0f);
-                    m_hPos[p++] = maxDisplacement;
+                    m_hPos[p++] = 0.5f;//maxDisplacement;
                     m_hPos[p++] = 1.0f; // radius
                     m_hVel[v++] = 0.0f;
                     m_hVel[v++] = 0.0f;

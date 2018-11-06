@@ -68,9 +68,9 @@ struct integrate_functor
 	    printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
-		printf("Velocity before swing: (%f, %f, %f), position: (%f, %f, %f)\n", vel.x, vel.y, vel.z, pos.x, pos.y, pos.z);
+		//printf("Velocity before swing: (%f, %f, %f), position: (%f, %f, %f)\n", vel.x, vel.y, vel.z, pos.x, pos.y, pos.z);
 	        vel += normalize(len - pos) * tension_val * deltaTime;
-		printf("Velocity after swing: (%f, %f, %f)\n", vel.x, vel.y, vel.z);
+		//printf("Velocity after swing: (%f, %f, %f)\n", vel.x, vel.y, vel.z);
 	    }
 	    else // pendulum breaks
 	    {
@@ -86,7 +86,7 @@ struct integrate_functor
         pos += vel * deltaTime;
 
         // set this to zero to disable collisions with cube sides
-#if 1
+#if 0
 
         if (pos.x > 1.0f - params.particleRadius)
         {
@@ -118,17 +118,17 @@ struct integrate_functor
             vel.z *= params.boundaryDamping;
         }
 
-#endif
 
         if (pos.y < -1.0f + params.particleRadius)
         {
             pos.y = -1.0f + params.particleRadius;
             vel.y *= params.boundaryDamping;
         }
+#endif
 	float proper_y = powf((powf(len_len, 2.0f) - powf(pos.z, 2.0f)), 1.0f / 2.0f);
-	printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);
-	printf("Supposed y for given z: %f\n", proper_y);
-	printf("Integrated new velocity: %f, %f, %f\n", vel.x, vel.y, vel.z);
+	//printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);
+	//printf("Supposed y for given z: %f\n", proper_y);
+	//printf("Integrated new velocity: %f, %f, %f\n", vel.x, vel.y, vel.z);
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);
         thrust::get<1>(t) = make_float4(vel, velData.w);
@@ -372,7 +372,7 @@ void collideD(float4 *newVel,               // output: new velocity
     // write new velocity back to original unsorted location
     uint originalIndex = gridParticleIndex[index];
     newVel[originalIndex] = make_float4(vel + force, 0.0f);
-    printf("newVel after collisions: %f, %f, %f\n", newVel[originalIndex].x, newVel[originalIndex].y, newVel[originalIndex].z);
+    //printf("newVel after collisions: %f, %f, %f\n", newVel[originalIndex].x, newVel[originalIndex].y, newVel[originalIndex].z);
 }
 
 #endif
