@@ -89,9 +89,9 @@ int numIterations = 0; // run until exit
 bool useOpenGL = false;
 
 // simulation parameters
-float timestep = 0.01f;
+float timestep = 0.1f;
 float damping = 1.0f;
-float gravity = 0.3f;
+float gravity = 0.0003f;
 int iterations = 1;
 int ballr = 10;
 float particleRadius = 1.0f / 64.0f;
@@ -715,7 +715,7 @@ main(int argc, char **argv)
     numParticles = NUM_PARTICLES;
     uint gridDim = GRID_SIZE;
     numIterations = 0;
-    useOpenGL = true;
+    useOpenGL = false;
 
     if (argc > 1)
     {
@@ -749,7 +749,7 @@ main(int argc, char **argv)
     printf("particles: %d\n", numParticles);
 
     bool benchmark = checkCmdLineFlag(argc, (const char **) argv, "benchmark") != 0;
-    //useOpenGL = checkCmdLineFlag(argc, (const char **) argv, "useOpenGL") != 0;
+    useOpenGL = checkCmdLineFlag(argc, (const char **) argv, "useOpenGL") != 0;
 
     if (checkCmdLineFlag(argc, (const char **) argv, "i"))
     {
