@@ -270,6 +270,7 @@ void display()
         if (renderer)
         {
             renderer->setVertexBuffer(psystem->getCurrentReadBuffer(), psystem->getNumParticles());
+            renderer->setLengthsBuffer(psystem->getCurrentLenReadBuffer(), psystem->getNumParticles());
         }
     }
 
@@ -532,6 +533,7 @@ void key(unsigned char key, int /*x*/, int /*y*/)
             if (renderer)
             {
                 renderer->setVertexBuffer(psystem->getCurrentReadBuffer(), psystem->getNumParticles());
+                renderer->setLengthsBuffer(psystem->getCurrentLenReadBuffer(), psystem->getNumParticles());
             }
 
             break;

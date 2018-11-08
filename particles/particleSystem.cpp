@@ -182,8 +182,6 @@ ParticleSystem::_initialize(int numParticles)
     {
         m_colorVBO = createVBO(m_numParticles*4*sizeof(float));
         registerGLBufferObject(m_colorVBO, &m_cuda_colorvbo_resource);
-        m_lencolorVBO = createVBO(m_numParticles*4*sizeof(float));
-        registerGLBufferObject(m_lencolorVBO, &m_cuda_lencolorvbo_resource);
 
         // fill color buffers
         glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
@@ -205,23 +203,10 @@ ParticleSystem::_initialize(int numParticles)
         }
         glUnmapBuffer(GL_ARRAY_BUFFER);
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_lencolorVBO);
-        float *lendata = (float *) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        float *lenptr = lendata;
-
-        for (uint i=0; i<m_numParticles; i++)
-        {
-            *lenptr++ = 0.0f;
-            *lenptr++ = 0.0f;
-            *lenptr++ = 0.0f;
-            *lenptr++ = 1.0f;
-        }
-        glUnmapBuffer(GL_ARRAY_BUFFER);
     }
     else
     {
         checkCudaErrors(cudaMalloc((void **)&m_cudaColorVBO, sizeof(float)*numParticles*4));
-        checkCudaErrors(cudaMalloc((void **)&m_cudaLenColorVBO, sizeof(float)*numParticles*4));
     }
 
     sdkCreateTimer(&m_timer);
@@ -257,19 +242,16 @@ ParticleSystem::_finalize()
     {
         unregisterGLBufferObject(m_cuda_colorvbo_resource);
         unregisterGLBufferObject(m_cuda_posvbo_resource);
-        unregisterGLBufferObject(m_cuda_lencolorvbo_resource);
         unregisterGLBufferObject(m_cuda_lenvbo_resource);
         glDeleteBuffers(1, (const GLuint *)&m_posVbo);
         glDeleteBuffers(1, (const GLuint *)&m_colorVBO);
         glDeleteBuffers(1, (const GLuint *)&m_lenVbo);
-        glDeleteBuffers(1, (const GLuint *)&m_lencolorVBO);
     }
     else
     {
         checkCudaErrors(cudaFree(m_cudaPosVBO));
         checkCudaErrors(cudaFree(m_cudaColorVBO));
         checkCudaErrors(cudaFree(m_cudaLenVBO));
-        checkCudaErrors(cudaFree(m_cudaLenColorVBO));
     }
 }
 

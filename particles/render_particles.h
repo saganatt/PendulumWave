@@ -19,7 +19,9 @@ class ParticleRenderer
         ~ParticleRenderer();
 
         void setPositions(float *pos, int numParticles);
+        void setLengths(float *len, int numParticles);
         void setVertexBuffer(unsigned int vbo, int numParticles);
+        void setLengthsBuffer(unsigned int vbo, int numParticles);
         void setColorBuffer(unsigned int vbo)
         {
             m_colorVBO = vbo;
@@ -60,6 +62,7 @@ class ParticleRenderer
 
     protected: // data
         float *m_pos;
+        float *m_len;
         int m_numParticles;
 
         float m_pointSize;
@@ -70,6 +73,7 @@ class ParticleRenderer
         GLuint m_program;
 
         GLuint m_vbo;
+        GLuint m_lenvbo;
         GLuint m_colorVBO;
 };
 
