@@ -81,7 +81,7 @@ int idleCounter = 0;
 int demoCounter = 0;
 const int idleDelay = 2000;
 
-enum { M_VIEW = 0, M_MOVE };
+enum { M_VIEW = 0, M_MOVE, M_PLE_MOVE };
 
 uint numParticles = 0;
 uint3 gridSize;
@@ -89,17 +89,22 @@ int numIterations = 0; // run until exit
 bool useOpenGL = false;
 
 // simulation parameters
-float timestep = 0.1f;
+float timestep = 1f;
 float damping = 1.0f;
 float gravity = 0.0003f;
 int iterations = 1;
 int ballr = 10;
-float particleRadius = 1.0f / 64.0f;
+//float particleRadius = 1.0f / 64.0f;
 
 float collideSpring = 0.5f;;
 float collideDamping = 0.02f;;
 float collideShear = 0.1f;
 float collideAttraction = 0.0f;
+
+int minOscillations = 50;
+float tCycle = 6000.0f;
+float breakingTension = 10.0f;
+float ropeSpring = 8.0f;
 
 ParticleSystem *psystem = 0;
 
@@ -255,6 +260,10 @@ void display()
         psystem->setCollideDamping(collideDamping);
         psystem->setCollideShear(collideShear);
         psystem->setCollideAttraction(collideAttraction);
+        psystem->setMinOscillations(minOscillations);
+        psystem->setTCycle(tCycle);
+        psystem->setBreakingTension(breakingTension);
+        psystem->setRopeSpring(ropeSpring);
 
         psystem->update(timestep);
 
@@ -281,6 +290,7 @@ void display()
     glRotatef(camera_rot_lag[0], 1.0, 0.0, 0.0);
     glRotatef(camera_rot_lag[1], 0.0, 1.0, 0.0);
 
+    // modelView gets 16 values - modelview matrix on top of the modelview matrix stack
     glGetFloatv(GL_MODELVIEW_MATRIX, modelView);
 
     // cube
@@ -291,8 +301,11 @@ void display()
     glPushMatrix();
     float3 p = psystem->getColliderPos();
     glTranslatef(p.x, p.y, p.z);
-    glColor3f(1.0, 0.0, 0.0);
-    glutSolidSphere(psystem->getColliderRadius(), 20, 10);
+    if(mode != MODE_PLE_MOVE)
+    {
+        glColor3f(1.0, 0.0, 0.0);
+        glutSolidSphere(psystem->getColliderRadius(), 20, 10);
+    }
     glPopMatrix();
 
     if (renderer && displayEnabled)
@@ -462,6 +475,7 @@ void motion(int x, int y)
             break;
 
         case M_MOVE:
+        case M_PLE_MOVE: // uses Collider field to store position but kernel process it in a different way
             {
                 float translateSpeed = 0.003f;
                 float3 p = psystem->getColliderPos();
@@ -534,8 +548,14 @@ void key(unsigned char key, int /*x*/, int /*y*/)
             mode = M_VIEW;
             break;
 
-        case 'm':
+        case 'b':
             mode = M_MOVE;
+            psystem->setIsColliding(true);
+            break;
+
+        case 'm':
+            mode = M_PLE_MOVE;
+            psystem->setIsColliding(false);
             break;
 
         case 'p':
@@ -633,7 +653,7 @@ void idle(void)
     if (demoMode)
     {
         camera_rot[1] += 0.1f;
-
+/*
         if (demoCounter++ > 1000)
         {
             ballr = 10 + (rand() % 10);
@@ -641,7 +661,7 @@ void idle(void)
             demoCounter = 0;
         }
     }
-
+*/
     glutPostRedisplay();
 }
 
@@ -657,21 +677,29 @@ void initParams()
         collideDamping = 0.0f;
         collideShear = 0.0f;
         collideAttraction = 0.0f;
-
+        minOscillations = 0;
+        tCycle = 0.0f;
+        breakingTension = 0.0f;
+        ropeSpring = 0.0f;
     }
     else if(useOpenGL)
     {
         // create a new parameter list
         params = new ParamListGL("misc");
-        params->AddParam(new Param<float>("time step", timestep, 0.0f, 1.0f, 0.01f, &timestep));
+        params->AddParam(new Param<float>("time step", timestep, 0.0f, 5.0f, 0.01f, &timestep));
         params->AddParam(new Param<float>("damping"  , damping , 0.0f, 1.0f, 0.001f, &damping));
-        params->AddParam(new Param<float>("gravity"  , gravity , 0.0f, 0.001f, 0.0001f, &gravity));
+        params->AddParam(new Param<float>("gravity"  , gravity , 0.0f, 0.01f, 0.0001f, &gravity));
         params->AddParam(new Param<int> ("ball radius", ballr , 1, 20, 1, &ballr));
 
         params->AddParam(new Param<float>("collide spring" , collideSpring , 0.0f, 1.0f, 0.001f, &collideSpring));
         params->AddParam(new Param<float>("collide damping", collideDamping, 0.0f, 0.1f, 0.001f, &collideDamping));
         params->AddParam(new Param<float>("collide shear"  , collideShear  , 0.0f, 0.1f, 0.001f, &collideShear));
         params->AddParam(new Param<float>("collide attract", collideAttraction, 0.0f, 0.1f, 0.001f, &collideAttraction));
+
+        params->AddParam(new Param<int> ("min oscillations", minOscillations, 1, 50, 1, &minOscillations));
+        params->AddParam(new Param<float> ("pend wave cycle", tCycle, 0.0f, 10000.0f, 0.1f, &tCycle));
+        params->AddParam(new Param<float> ("breaking tension", breakingTension, 0.0f, 100.0f, 0.1f, &breakingTension));
+        params->AddParam(new Param<float> ("rope spring", ropeSpring, 0.0f, 10.0f, 0.1f, &ropeSpring));
     }
 }
 
@@ -689,7 +717,8 @@ void initMenus()
     glutAddMenuEntry("Reset Newton craddle [4]", '4');
     glutAddMenuEntry("Add sphere [5]", '5');
     glutAddMenuEntry("View mode [v]", 'v');
-    glutAddMenuEntry("Move cursor mode [m]", 'm');
+    glutAddMenuEntry("Move collider ball  mode [b]", 'b');
+    glutAddMenuEntry("Move particle mode [m]", 'm');
     glutAddMenuEntry("Toggle point rendering [p]", 'p');
     glutAddMenuEntry("Toggle animation [ ]", ' ');
     glutAddMenuEntry("Step animation [ret]", 13);
@@ -736,14 +765,14 @@ main(int argc, char **argv)
             numIterations = 1;
         }
     }
-
+/*
     uint maxParticles = floorf((2.0f - 2.0f * particleRadius) / (3.0f * particleRadius)) + 1.0f;
     if(numParticles > maxParticles)
     {
 	printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, numParticles);
 	numParticles = maxParticles;
     }
-
+*/
     gridSize.x = gridSize.y = gridSize.z = gridDim;
     printf("grid: %d x %d x %d = %d cells\n", gridSize.x, gridSize.y, gridSize.z, gridSize.x*gridSize.y*gridSize.z);
     printf("particles: %d\n", numParticles);

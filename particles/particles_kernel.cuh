@@ -28,6 +28,7 @@ struct SimParams
 {
     float3 colliderPos;
     float  colliderRadius;
+    bool isColliding; // true == M_MOVE, false == M_PLE_MOVE
 
     float3 gravity;
     float globalDamping;
@@ -48,6 +49,7 @@ struct SimParams
     float boundaryDamping;
 
     float breakingTension;
+    float ropeSpring;
     float tCycle;
     uint minOscillations;
 };
