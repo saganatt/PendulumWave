@@ -77,7 +77,7 @@ struct integrate_functor
 	
 	    // tension is not a real force - does not have a fixed direction
 	    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
-	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / lenData.w + ropeSpring * (length(pos - len) - len_len);
+	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / lenData.w + params.ropeSpring * (length(pos - len) - len_len);
 	    //printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {

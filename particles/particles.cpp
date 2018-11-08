@@ -89,7 +89,7 @@ int numIterations = 0; // run until exit
 bool useOpenGL = false;
 
 // simulation parameters
-float timestep = 1f;
+float timestep = 1.0f;
 float damping = 1.0f;
 float gravity = 0.0003f;
 int iterations = 1;
@@ -302,7 +302,7 @@ void display()
     glPushMatrix();
     float3 p = psystem->getColliderPos();
     glTranslatef(p.x, p.y, p.z);
-    if(mode != MODE_PLE_MOVE)
+    if(mode != M_PLE_MOVE)
     {
         glColor3f(1.0, 0.0, 0.0);
         glutSolidSphere(psystem->getColliderRadius(), 20, 10);
@@ -661,9 +661,9 @@ void idle(void)
             ballr = 10 + (rand() % 10);
             addSphere();
             demoCounter = 0;
-        }
+        }*/
     }
-*/
+
     glutPostRedisplay();
 }
 

@@ -35,7 +35,7 @@ ParticleRenderer::ParticleRenderer()
       m_program(0),
       m_vbo(0),
       m_lenvbo(0),
-      m_colorVBO(0),
+      m_colorVBO(0)
 {
     _initGL();
 }
