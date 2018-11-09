@@ -93,6 +93,7 @@ ParticleSystem::~ParticleSystem()
 uint
 ParticleSystem::createVBO(uint size)
 {
+    printf("createVBO\n");
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -167,6 +168,7 @@ ParticleSystem::_initialize(int numParticles)
     {
         m_posVbo = createVBO(memSize);
         m_lenVbo = createVBO(memSize);
+        printf("On initialize(). m_lenVbo created, registeringGLBufferObject\n");
         registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
         registerGLBufferObject(m_lenVbo, &m_cuda_lenvbo_resource);
     }
@@ -174,6 +176,7 @@ ParticleSystem::_initialize(int numParticles)
     {
         checkCudaErrors(cudaMalloc((void **)&m_cudaPosVBO, memSize)) ;
         checkCudaErrors(cudaMalloc((void **)&m_cudaLenVBO, memSize)) ;
+        printf("On initialize(). Not using OpenGL, allocated m_cudaLenVBO\n");
     }
 
     allocateArray((void **)&m_dVel, memSize);
@@ -254,15 +257,18 @@ ParticleSystem::_finalize()
         unregisterGLBufferObject(m_cuda_colorvbo_resource);
         unregisterGLBufferObject(m_cuda_posvbo_resource);
         unregisterGLBufferObject(m_cuda_lenvbo_resource);
+        printf("On finalize() unregisterGLBufferObject m_cuda_lenvbo_resource\n");
         glDeleteBuffers(1, (const GLuint *)&m_posVbo);
         glDeleteBuffers(1, (const GLuint *)&m_colorVBO);
         glDeleteBuffers(1, (const GLuint *)&m_lenVbo);
+        printf("On finalize() deletedBuffers m_lenVbo\n");
     }
     else
     {
         checkCudaErrors(cudaFree(m_cudaPosVBO));
         checkCudaErrors(cudaFree(m_cudaColorVBO));
         checkCudaErrors(cudaFree(m_cudaLenVBO));
+        printf("On finalize(). Not using OpenGL, freed m_cudaLenVBO\n");
     }
 }
 
@@ -279,11 +285,13 @@ ParticleSystem::update(float deltaTime)
     {
         dPos = (float *) mapGLBufferObject(&m_cuda_posvbo_resource);
         dLen = (float *) mapGLBufferObject(&m_cuda_lenvbo_resource);
+        printf("update() started. MappedGLBufferObject m_cuda_lenvbo_resource\n");
     }
     else
     {
         dPos = (float *) m_cudaPosVBO;
         dLen = (float *) m_cudaLenVBO;
+        printf("update() started. Not using OpenGL, allocated m_cudaLenVBO\n");
     }
 
     // update constants
@@ -339,6 +347,7 @@ ParticleSystem::update(float deltaTime)
     {
         unmapGLBufferObject(m_cuda_posvbo_resource);
         unmapGLBufferObject(m_cuda_lenvbo_resource);
+        printf("update() finishing. UnmappedGLBufferObject m_cuda_lenvbo_resource\n");
     }
 }
 
@@ -395,6 +404,7 @@ ParticleSystem::getArray(ParticleArray array)
     {
         default:
         case POSITION:
+            printf("getArray for position\n");
             hdata = m_hPos;
             ddata = m_dPos;
             cuda_vbo_resource = m_cuda_posvbo_resource;
@@ -406,6 +416,7 @@ ParticleSystem::getArray(ParticleArray array)
             break;
 
 	case LENGTH:
+            printf("getArray for length\n");
 	    hdata = m_hLen;
 	    ddata = m_dVel;
             cuda_vbo_resource = m_cuda_lenvbo_resource;
@@ -429,6 +440,7 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
             {
                 if (m_bUseOpenGL)
                 {
+                    printf("setArray for position\n");
                     unregisterGLBufferObject(m_cuda_posvbo_resource);
                     glBindBuffer(GL_ARRAY_BUFFER, m_posVbo);
                     glBufferSubData(GL_ARRAY_BUFFER, start*4*sizeof(float), count*4*sizeof(float), data);
@@ -448,6 +460,7 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
             {
                 if (m_bUseOpenGL)
                 {
+                    printf("setArray for length\n");
                     unregisterGLBufferObject(m_cuda_lenvbo_resource);
                     glBindBuffer(GL_ARRAY_BUFFER, m_lenVbo);
                     glBufferSubData(GL_ARRAY_BUFFER, start*4*sizeof(float), count*4*sizeof(float), data);
@@ -545,7 +558,8 @@ ParticleSystem::reset(ParticleConfig config)
             break;
 
 	case CONFIG_PEND:
-	    {		
+	    {
+                printf("reset() CONFIG_PEND\n");
 		float initOffset = m_params.particleRadius * 1.0f;
 		float startx = initOffset - 1.0f;
 		float spacing = m_params.particleRadius * 3.0f;
@@ -586,6 +600,7 @@ ParticleSystem::reset(ParticleConfig config)
 
 	case CONFIG_NEWTON:
 	    {
+                printf("reset() CONFIG_NEWTON\n");
 		float len = 0.1f;
 		float initOffset = len;
 		float startx = initOffset - 1.0f;
