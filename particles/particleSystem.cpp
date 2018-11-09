@@ -82,6 +82,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.tCycle = 6000.0f; // 120.0f * m_params.minOscillations;
 
     _initialize(numParticles);
+//    reset(CONFIG_PEND);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -291,7 +292,7 @@ ParticleSystem::update(float deltaTime)
     {
         dPos = (float *) m_cudaPosVBO;
         dLen = (float *) m_cudaLenVBO;
-        printf("update() started. Not using OpenGL, allocated m_cudaLenVBO\n");
+        printf("update() started. Not using OpenGL, uses m_cudaLenVBO\n");
     }
 
     // update constants
@@ -467,8 +468,8 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
                     registerGLBufferObject(m_lenVbo, &m_cuda_lenvbo_resource);
                 }
-		//else
-		//    copyArrayToDevice(m_dLen, data, start*4*sizeof(float), count*4*sizeof(float));
+		else
+		    copyArrayToDevice(m_cudaLenVBO, data, start*4*sizeof(float), count*4*sizeof(float));
             }
             //copyArrayToDevice(m_dLen, data, start*4*sizeof(float), count*4*sizeof(float));
             break;
