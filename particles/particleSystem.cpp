@@ -101,6 +101,17 @@ ParticleSystem::createVBO(uint size)
     return vbo;
 }
 
+uint
+ParticleSystem::createLenVBO(uint size, )
+{
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, size, 0, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return vbo;
+}
+
 inline float lerp(float a, float b, float t)
 {
     return a + t*(b-a);
@@ -424,8 +435,8 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
                     registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
                 }
-		//else
-		//    copyArrayToDevice(m_posVbo, data, start*4*sizeof(float), count*4*sizeof(float));
+		else
+		    copyArrayToDevice(m_posVbo, data, start*4*sizeof(float), count*4*sizeof(float));
             }
             break;
 
@@ -443,8 +454,8 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
                     registerGLBufferObject(m_lenVbo, &m_cuda_lenvbo_resource);
                 }
-		//else
-		//    copyArrayToDevice(m_posVbo, data, start*4*sizeof(float), count*4*sizeof(float));
+		else
+		    copyArrayToDevice(m_lenVbo, data, start*4*sizeof(float), count*4*sizeof(float));
             }
             //copyArrayToDevice(m_dLen, data, start*4*sizeof(float), count*4*sizeof(float));
             break;
