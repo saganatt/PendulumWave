@@ -64,9 +64,9 @@ void ParticleRenderer::setVertexBuffer(unsigned int vbo, int numParticles)
     m_numParticles = numParticles;
 }
 
-void ParticleRenderer::setLengthsBuffer(unsigned int vbo, int numParticles)
+void ParticleRenderer::setLengthsBuffer(unsigned int lenvbo, unsigned int vbo, int numParticles)
 {
-    // TODO: find a way to set a zipped pos + len buffer - does it need createVBO?
+    // TODO: find a way to set a zipped pos + len buffer
     m_vbo = vbo;
     //unsigned int m_comb_vbo = createVBO(sizeof(float) * 6 * numParticles);
     m_numParticles = numParticles;
@@ -110,7 +110,7 @@ void ParticleRenderer::_drawPoints()
     }
     else
     {
-// ****
+// **** WILL NOTT WORK CORRECTLY
         if(m_lenvbo)
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_lenvbo);
@@ -119,11 +119,21 @@ void ParticleRenderer::_drawPoints()
 
             glLineWidth(1);
             glColor3f(0.0f, 0.0f, 0.0f);
-            glDrawArrays(GL_LINES, 0, 2);
+            glDrawArrays(GL_LINES, 0, 3);
 
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_VERTEX_ARRAY);
         }
+
+        // FROM OPENGL FORUM:
+        // stride = 12 = total size of vertex format
+        // offset for the first attribute = 0
+        // offset for the second attribute = size of of previous attribute
+        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, 0);
+        // glEnableVertexAttribArray(0);
+        // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 12, 12);
+        // glEnableVertexAttribArray(1);
+        // Draw the object
 // *****
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glVertexPointer(4, GL_FLOAT, 0, 0);
