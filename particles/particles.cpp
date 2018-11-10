@@ -57,7 +57,7 @@
 #define THRESHOLD         0.30f
 
 #define GRID_SIZE       64
-#define NUM_PARTICLES   1
+#define NUM_PARTICLES   16384
 
 const uint width = 640, height = 480;
 
@@ -767,14 +767,7 @@ main(int argc, char **argv)
             numIterations = 1;
         }
     }
-/*
-    uint maxParticles = floorf((2.0f - 2.0f * particleRadius) / (3.0f * particleRadius)) + 1.0f;
-    if(numParticles > maxParticles)
-    {
-	printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, numParticles);
-	numParticles = maxParticles;
-    }
-*/
+
     gridSize.x = gridSize.y = gridSize.z = gridDim;
     printf("grid: %d x %d x %d = %d cells\n", gridSize.x, gridSize.y, gridSize.z, gridSize.x*gridSize.y*gridSize.z);
     printf("particles: %d\n", numParticles);

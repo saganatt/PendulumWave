@@ -190,6 +190,7 @@ class ParticleSystem
         void _finalize();
 
         void initGrid(uint *size, float spacing, float jitter, uint numParticles);
+        void initPendWave(uint *size, float spacing, uint numParticles);
 
     protected: // data
         bool m_bInitialized, m_bUseOpenGL;

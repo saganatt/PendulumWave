@@ -78,11 +78,10 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
 
     m_params.breakingTension = 10.0f;
     m_params.ropeSpring = 8.0f;
-    m_params.minOscillations = 50;
-    m_params.tCycle = 6000.0f; // 120.0f * m_params.minOscillations;
+    m_params.minOscillations = 10;
+    m_params.tCycle = 4800.0f; // 480.0f * m_params.minOscillations;
 
     _initialize(numParticles);
-//    reset(CONFIG_PEND);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -94,7 +93,6 @@ ParticleSystem::~ParticleSystem()
 uint
 ParticleSystem::createVBO(uint size)
 {
-    printf("createVBO\n");
     GLuint vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -169,7 +167,6 @@ ParticleSystem::_initialize(int numParticles)
     {
         m_posVbo = createVBO(memSize);
         m_lenVbo = createVBO(memSize);
-        printf("On initialize(). m_lenVbo created, registeringGLBufferObject\n");
         registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
         registerGLBufferObject(m_lenVbo, &m_cuda_lenvbo_resource);
     }
@@ -177,7 +174,6 @@ ParticleSystem::_initialize(int numParticles)
     {
         checkCudaErrors(cudaMalloc((void **)&m_cudaPosVBO, memSize)) ;
         checkCudaErrors(cudaMalloc((void **)&m_cudaLenVBO, memSize)) ;
-        printf("On initialize(). Not using OpenGL, allocated m_cudaLenVBO\n");
     }
 
     allocateArray((void **)&m_dVel, memSize);
@@ -258,18 +254,15 @@ ParticleSystem::_finalize()
         unregisterGLBufferObject(m_cuda_colorvbo_resource);
         unregisterGLBufferObject(m_cuda_posvbo_resource);
         unregisterGLBufferObject(m_cuda_lenvbo_resource);
-        printf("On finalize() unregisterGLBufferObject m_cuda_lenvbo_resource\n");
         glDeleteBuffers(1, (const GLuint *)&m_posVbo);
         glDeleteBuffers(1, (const GLuint *)&m_colorVBO);
         glDeleteBuffers(1, (const GLuint *)&m_lenVbo);
-        printf("On finalize() deletedBuffers m_lenVbo\n");
     }
     else
     {
         checkCudaErrors(cudaFree(m_cudaPosVBO));
         checkCudaErrors(cudaFree(m_cudaColorVBO));
         checkCudaErrors(cudaFree(m_cudaLenVBO));
-        printf("On finalize(). Not using OpenGL, freed m_cudaLenVBO\n");
     }
 }
 
@@ -286,13 +279,11 @@ ParticleSystem::update(float deltaTime)
     {
         dPos = (float *) mapGLBufferObject(&m_cuda_posvbo_resource);
         dLen = (float *) mapGLBufferObject(&m_cuda_lenvbo_resource);
-        printf("update() started. MappedGLBufferObject m_cuda_lenvbo_resource\n");
     }
     else
     {
         dPos = (float *) m_cudaPosVBO;
         dLen = (float *) m_cudaLenVBO;
-        printf("update() started. Not using OpenGL, uses m_cudaLenVBO\n");
     }
 
     // update constants
@@ -348,7 +339,6 @@ ParticleSystem::update(float deltaTime)
     {
         unmapGLBufferObject(m_cuda_posvbo_resource);
         unmapGLBufferObject(m_cuda_lenvbo_resource);
-        printf("update() finishing. UnmappedGLBufferObject m_cuda_lenvbo_resource\n");
     }
 }
 
@@ -405,7 +395,6 @@ ParticleSystem::getArray(ParticleArray array)
     {
         default:
         case POSITION:
-            printf("getArray for position\n");
             hdata = m_hPos;
             ddata = m_dPos;
             cuda_vbo_resource = m_cuda_posvbo_resource;
@@ -417,7 +406,6 @@ ParticleSystem::getArray(ParticleArray array)
             break;
 
 	case LENGTH:
-            printf("getArray for length\n");
 	    hdata = m_hLen;
 	    ddata = m_dVel;
             cuda_vbo_resource = m_cuda_lenvbo_resource;
@@ -441,15 +429,12 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
             {
                 if (m_bUseOpenGL)
                 {
-                    printf("setArray for position\n");
                     unregisterGLBufferObject(m_cuda_posvbo_resource);
                     glBindBuffer(GL_ARRAY_BUFFER, m_posVbo);
                     glBufferSubData(GL_ARRAY_BUFFER, start*4*sizeof(float), count*4*sizeof(float), data);
                     glBindBuffer(GL_ARRAY_BUFFER, 0);
                     registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
                 }
-		//else
-		//    copyArrayToDevice(m_dPos, data, start*4*sizeof(float), count*4*sizeof(float));
             }
             break;
 
@@ -461,7 +446,6 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
             {
                 if (m_bUseOpenGL)
                 {
-                    printf("setArray for length\n");
                     unregisterGLBufferObject(m_cuda_lenvbo_resource);
                     glBindBuffer(GL_ARRAY_BUFFER, m_lenVbo);
                     glBufferSubData(GL_ARRAY_BUFFER, start*4*sizeof(float), count*4*sizeof(float), data);
@@ -471,7 +455,6 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
 		else
 		    copyArrayToDevice(m_cudaLenVBO, data, start*4*sizeof(float), count*4*sizeof(float));
             }
-            //copyArrayToDevice(m_dLen, data, start*4*sizeof(float), count*4*sizeof(float));
             break;
     }
 }
@@ -517,6 +500,108 @@ ParticleSystem::initGrid(uint *size, float spacing, float jitter, uint numPartic
 }
 
 void
+ParticleSystem::initPendWave()
+{
+    float pisq = powf(CUDART_PI_F, 2.0f);
+    float tsq = powf(m_params.tCycle, 2.0f);
+    float g = -m_params.gravity.y;
+    float len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + m_numParticles - 1, 2.0f));
+    float maxDisplacement = len / 6.0f; // small angle approximation works for angles <= 1/9 rad
+    float maxDisplacementSq = powf(maxDisplacement, 2.0f);
+
+    float spacingx = m_params.particleRadius * 3.0f;
+    float spacingz = spacingx + 2.0f * maxDisplacement;
+    float spacingy = m_params.particleRadius * 2.0f + (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations, 2.0f));
+
+    uint numPart1D = (int) ceilf(powf((float) m_numParticles, 1.0f / 3.0f));
+    float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
+    float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
+    float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
+    
+    for (uint z=0; z<numPart1D; z++)
+    {
+        for (uint y=0; y<numPart1D; y++)
+        {
+            for (uint x=0; x<numPart1D; x++)
+            {
+                uint i = (z*numPart1D*numPart1D) + (y*numPart1D) + x;
+
+                if (i < m_numParticles)
+                {
+                    len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f));
+		    m_hLen[i*4] = (spacingx * x) + startx;
+		    m_hLen[i*4+1] = (spacingy * y) + starty;
+		    m_hLen[i*4+2] = (spacingz * z) + startz;
+		    m_hLen[i*4+3] = len;
+
+                    m_hPos[i*4] = m_hLen[i*4];
+                    m_hPos[i*4+1] = -powf(powf(len, 2.0f) - maxDisplacementSq, 1.0f / 2.0f);
+                    m_hPos[i*4+2] = maxDisplacement;
+                    m_hPos[i*4+3] = 1.0f;
+
+                    m_hVel[i*4] = 0.0f;
+                    m_hVel[i*4+1] = 0.0f;
+                    m_hVel[i*4+2] = 0.0f;
+                    m_hVel[i*4+3] = 0.0f;
+                }
+            }
+        }
+    }
+}
+
+void
+ParticleSystem::initNewton()
+{
+    float len = 1.0f;
+    float lensq = powf(len, 2.0f);
+    float spacingx = m_params.particleRadius * 2.0f;
+    float spacingy = m_params.particleRadius * 2.0f + len;
+    float spacingz = spacingx;
+
+    uint numPart1D = (int) ceilf(powf((float) m_numParticles, 1.0f / 3.0f));
+    float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
+    float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
+    float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
+    
+    for (uint z=0; z<numPart1D; z++)
+    {
+        for (uint y=0; y<numPart1D; y++)
+        {
+            for (uint x=0; x<numPart1D; x++)
+            {
+                uint i = (z*numPart1D*numPart1D) + (y*numPart1D) + x;
+
+                if (i < m_numParticles)
+                {
+		    m_hLen[i*4] = (spacingx * x) + startx;
+		    m_hLen[i*4+1] = (spacingy * y) + starty;
+		    m_hLen[i*4+2] = (spacingz * z) + startz;
+		    m_hLen[i*4+3] = len;
+
+                    if(x == 0) // The pendulum that starts the craddle
+                    {
+                        m_hPos[i*4] = len / 6.0f;
+                        m_hPos[i*4+1] = m_hLen[i*4+1] - powf(lensq + powf(m_hPos[i*4], 2.0f), 1.0f / 2.0f);
+                    }
+                    else
+                    {
+                        m_hPos[i*4] = m_hLen[i*4];
+                        m_hPos[i*4+1] = m_hLen[i*4+1] - len;
+                    }
+                    m_hPos[i*4+2] = m_hLen[i*4+2];
+                    m_hPos[i*4+3] = 1.0f;
+
+                    m_hVel[i*4] = 0.0f;
+                    m_hVel[i*4+1] = 0.0f;
+                    m_hVel[i*4+2] = 0.0f;
+                    m_hVel[i*4+3] = 0.0f;
+                }
+            }
+        }
+    }
+}
+
+void
 ParticleSystem::reset(ParticleConfig config)
 {
     switch (config)
@@ -545,6 +630,8 @@ ParticleSystem::reset(ParticleConfig config)
 		    m_hLen[l++] = -1.0f;
 		    m_hLen[l++] = -1.0f;
                 }
+
+                isColliding = true;
             }
             break;
 
@@ -555,95 +642,21 @@ ParticleSystem::reset(ParticleConfig config)
                 uint gridSize[3];
                 gridSize[0] = gridSize[1] = gridSize[2] = s;
                 initGrid(gridSize, m_params.particleRadius*2.0f, jitter, m_numParticles);
+                isColliding = true;
             }
             break;
 
 	case CONFIG_PEND:
 	    {
-                printf("reset() CONFIG_PEND\n");
-		float initOffset = m_params.particleRadius * 1.0f;
-		float startx = initOffset - 1.0f;
-		float spacing = m_params.particleRadius * 3.0f;
-	        uint maxParticles = floorf((2.0f - 2.0f * initOffset) / spacing) + 1.0f;
-	        if(m_numParticles > maxParticles)
-	        {
-		    printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, m_numParticles);
-		    m_numParticles = maxParticles;
-	        }
-
-                int p = 0, v = 0, l = 0;
-		float pisq = powf(CUDART_PI_F, 2.0f);
-		float tsq = powf(m_params.tCycle, 2.0f);
-	        float g = -m_params.gravity.y;
-		float len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + m_numParticles - 1, 2.0f));
-		float maxDisplacement = len / 6.0f; // small angle approximation works for angles <= 1/9 rad
-		float maxDisplacementSq = powf(maxDisplacement, 2.0f);
-
-                for (uint i=0; i < m_numParticles; i++)
-                {
-		    len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f));
-		    m_hLen[l++] = startx;
-		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = len;// length
-                    m_hPos[p++] = startx;
-                    m_hPos[p++] = -powf(powf(len, 2.0f) - maxDisplacementSq, 1.0f / 2.0f);
-                    m_hPos[p++] = maxDisplacement;
-                    m_hPos[p++] = 1.0f; // radius
-                    m_hVel[v++] = 0.0f;
-                    m_hVel[v++] = 0.0f;
-                    m_hVel[v++] = 0.0f;
-                    m_hVel[v++] = 0.0f;
-		    startx += spacing;
-                }
+                initPendWave();
+                isColliding = false;
 	    }
 	    break;
 
 	case CONFIG_NEWTON:
 	    {
-                printf("reset() CONFIG_NEWTON\n");
-		float len = 0.1f;
-		float initOffset = len;
-		float startx = initOffset - 1.0f;
-		float spacing = m_params.particleRadius * 2.0f;
-	        uint maxParticles = floorf((2.0f - 2.0f * initOffset) / spacing) + 1.0f;
-	        if(m_numParticles > maxParticles)
-	        {
-		    printf("max particles number exceeded, adopting max possible value = %d, provided value: %d\n", maxParticles, m_numParticles);
-		    m_numParticles = maxParticles;
-	        }
-                int p = 0, v = 0, l = 0;
-
-		// The pendulum that starts the craddle
-		m_hLen[l++] = startx;
-		m_hLen[l++] = 0.0f;
-		m_hLen[l++] = 0.0f;
-		m_hLen[l++] = len; // length
-	        m_hPos[p++] = startx;//len / 2.0f;
-	        m_hPos[p++] = -(powf(3.0f, 1.0f / 2.0f) / 2.0f) * len;
-	        m_hPos[p++] = 0.0f;
-	        m_hPos[p++] = 1.0f; // radius
-	        m_hVel[v++] = 0.0f;
-	        m_hVel[v++] = 0.0f;
-	        m_hVel[v++] = 0.0f;
-	        m_hVel[v++] = 0.0f;
-
-                for (uint i=1; i < m_numParticles; i++)
-                {
-		    startx += spacing;
-		    m_hLen[l++] = startx;
-		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = 0.0f;
-		    m_hLen[l++] = len;// length
-                    m_hPos[p++] = startx;
-                    m_hPos[p++] = -len;
-                    m_hPos[p++] = 0.0f;
-                    m_hPos[p++] = 1.0f; // radius
-                    m_hVel[v++] = 0.0f;
-                    m_hVel[v++] = 0.0f;
-                    m_hVel[v++] = 0.0f;
-                    m_hVel[v++] = 0.0f;
-                }
+                initNewton();
+                isColliding = false;
 	    }
 	    break;
     }

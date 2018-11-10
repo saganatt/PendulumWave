@@ -59,10 +59,10 @@ struct integrate_functor
 
 	// TODO: consider user trying to stretch the pendulum with the cursor
         // TODO: does it choose the proper particle? Does it move it too slowly?
+        //       bigger tolerance? 2 x r?
         // Additional fields to choose a particle on mouse down and move it all the time on mouse move?
         if(!params.isColliding && length(pos - params.colliderPos) <= params.particleRadius)
         {
-            //checkCursorAndMoveParticle();
             pos.x = params.colliderPos.x;
             pos.y = params.colliderPos.y;
             pos.z = params.colliderPos.z;
@@ -99,44 +99,47 @@ struct integrate_functor
         pos += vel * deltaTime;
 
         // set this to zero to disable collisions with cube sides
-#if 1
-
-        if (pos.x > 1.0f - params.particleRadius)
+//#if 1
+        if(len_len == -1)
         {
-            pos.x = 1.0f - params.particleRadius;
-            vel.x *= params.boundaryDamping;
+            if (pos.x > 1.0f - params.particleRadius)
+            {
+                pos.x = 1.0f - params.particleRadius;
+                vel.x *= params.boundaryDamping;
+            }
+
+            if (pos.x < -1.0f + params.particleRadius)
+            {
+                pos.x = -1.0f + params.particleRadius;
+                vel.x *= params.boundaryDamping;
+            }
+
+            if (pos.y > 1.0f - params.particleRadius)
+            {
+                pos.y = 1.0f - params.particleRadius;
+                vel.y *= params.boundaryDamping;
+            }
+
+            if (pos.z > 1.0f - params.particleRadius)
+            {
+                pos.z = 1.0f - params.particleRadius;
+                vel.z *= params.boundaryDamping;
+            }
+
+            if (pos.z < -1.0f + params.particleRadius)
+            {
+                pos.z = -1.0f + params.particleRadius;
+                vel.z *= params.boundaryDamping;
+            }
+    //#endif
+
+            if (pos.y < -1.0f + params.particleRadius)
+            {
+                pos.y = -1.0f + params.particleRadius;
+                vel.y *= params.boundaryDamping;
+            }
         }
 
-        if (pos.x < -1.0f + params.particleRadius)
-        {
-            pos.x = -1.0f + params.particleRadius;
-            vel.x *= params.boundaryDamping;
-        }
-
-        if (pos.y > 1.0f - params.particleRadius)
-        {
-            pos.y = 1.0f - params.particleRadius;
-            vel.y *= params.boundaryDamping;
-        }
-
-        if (pos.z > 1.0f - params.particleRadius)
-        {
-            pos.z = 1.0f - params.particleRadius;
-            vel.z *= params.boundaryDamping;
-        }
-
-        if (pos.z < -1.0f + params.particleRadius)
-        {
-            pos.z = -1.0f + params.particleRadius;
-            vel.z *= params.boundaryDamping;
-        }
-#endif
-
-        if (pos.y < -1.0f + params.particleRadius)
-        {
-            pos.y = -1.0f + params.particleRadius;
-            vel.y *= params.boundaryDamping;
-        }
 	float proper_y = powf((powf(len_len, 2.0f) - powf(pos.z, 2.0f)), 1.0f / 2.0f);
 	//printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);
 	//printf("Supposed y for given z: %f\n", proper_y);
