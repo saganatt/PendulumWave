@@ -61,10 +61,6 @@ class ParticleSystem
         {
             return m_colorVBO;
         }
-        unsigned int getCurrentLenReadBuffer() const
-        {
-            return m_lenVbo;
-        }
 
         void *getCudaPosVBO()              const
         {
@@ -73,10 +69,6 @@ class ParticleSystem
         void *getCudaColorVBO()            const
         {
             return (void *)m_cudaColorVBO;
-        }
-        void *getCudaLenVBO()              const
-        {
-            return (void *)m_cudaLenVBO;
         }
 
         void dumpGrid();
@@ -226,15 +218,12 @@ class ParticleSystem
 
         uint   m_posVbo;                // vertex buffer object for particle positions
         uint   m_colorVBO;              // vertex buffer object for colors
-        uint   m_lenVbo;                // vertex buffer object for pendulum pivots positions
 
         float *m_cudaPosVBO;            // these are the CUDA deviceMem Pos
         float *m_cudaColorVBO;          // these are the CUDA deviceMem Color
-        float *m_cudaLenVBO;            // these are the CUDA deviceMem Pos for pivots
 
         struct cudaGraphicsResource *m_cuda_posvbo_resource; // handles OpenGL-CUDA exchange
         struct cudaGraphicsResource *m_cuda_colorvbo_resource; // handles OpenGL-CUDA exchange
-        struct cudaGraphicsResource *m_cuda_lenvbo_resource; // handles OpenGL-CUDA exchange
 
         // params
         SimParams m_params;

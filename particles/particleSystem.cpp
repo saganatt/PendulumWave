@@ -166,18 +166,15 @@ ParticleSystem::_initialize(int numParticles)
     if (m_bUseOpenGL)
     {
         m_posVbo = createVBO(memSize);
-        m_lenVbo = createVBO(memSize);
         registerGLBufferObject(m_posVbo, &m_cuda_posvbo_resource);
-        registerGLBufferObject(m_lenVbo, &m_cuda_lenvbo_resource);
     }
     else
     {
         checkCudaErrors(cudaMalloc((void **)&m_cudaPosVBO, memSize)) ;
-        checkCudaErrors(cudaMalloc((void **)&m_cudaLenVBO, memSize)) ;
     }
 
     allocateArray((void **)&m_dVel, memSize);
-    //allocateArray((void **)&m_dLen, memSize);
+    allocateArray((void **)&m_dLen, memSize);
 
     allocateArray((void **)&m_dSortedPos, memSize);
     allocateArray((void **)&m_dSortedVel, memSize);
@@ -239,7 +236,7 @@ ParticleSystem::_finalize()
     delete [] m_hCellEnd;
 
     freeArray(m_dVel);
-    //freeArray(m_dLen);
+    freeArray(m_dLen);
     freeArray(m_dSortedPos);
     freeArray(m_dSortedVel);
     freeArray(m_dSortedLen);
@@ -253,16 +250,13 @@ ParticleSystem::_finalize()
     {
         unregisterGLBufferObject(m_cuda_colorvbo_resource);
         unregisterGLBufferObject(m_cuda_posvbo_resource);
-        unregisterGLBufferObject(m_cuda_lenvbo_resource);
         glDeleteBuffers(1, (const GLuint *)&m_posVbo);
         glDeleteBuffers(1, (const GLuint *)&m_colorVBO);
-        glDeleteBuffers(1, (const GLuint *)&m_lenVbo);
     }
     else
     {
         checkCudaErrors(cudaFree(m_cudaPosVBO));
         checkCudaErrors(cudaFree(m_cudaColorVBO));
-        checkCudaErrors(cudaFree(m_cudaLenVBO));
     }
 }
 
@@ -273,17 +267,14 @@ ParticleSystem::update(float deltaTime)
     assert(m_bInitialized);
 
     float *dPos;
-    float *dLen;
 
     if (m_bUseOpenGL)
     {
         dPos = (float *) mapGLBufferObject(&m_cuda_posvbo_resource);
-        dLen = (float *) mapGLBufferObject(&m_cuda_lenvbo_resource);
     }
     else
     {
         dPos = (float *) m_cudaPosVBO;
-        dLen = (float *) m_cudaLenVBO;
     }
 
     // update constants
@@ -293,7 +284,7 @@ ParticleSystem::update(float deltaTime)
     integrateSystem(
         dPos,
         m_dVel,
-	dLen,
+	m_dLen,
         deltaTime,
         m_numParticles);
 
@@ -319,7 +310,7 @@ ParticleSystem::update(float deltaTime)
         m_dGridParticleIndex,
         dPos,
         m_dVel,
-	dLen,
+	m_dLen,
         m_numParticles,
         m_numGridCells);
 
@@ -338,7 +329,6 @@ ParticleSystem::update(float deltaTime)
     if (m_bUseOpenGL)
     {
         unmapGLBufferObject(m_cuda_posvbo_resource);
-        unmapGLBufferObject(m_cuda_lenvbo_resource);
     }
 }
 
@@ -408,7 +398,6 @@ ParticleSystem::getArray(ParticleArray array)
 	case LENGTH:
 	    hdata = m_hLen;
 	    ddata = m_dVel;
-            cuda_vbo_resource = m_cuda_lenvbo_resource;
 	    break;
     }
 
@@ -443,18 +432,7 @@ ParticleSystem::setArray(ParticleArray array, const float *data, int start, int 
             break;
 	    
 	case LENGTH:
-            {
-                if (m_bUseOpenGL)
-                {
-                    unregisterGLBufferObject(m_cuda_lenvbo_resource);
-                    glBindBuffer(GL_ARRAY_BUFFER, m_lenVbo);
-                    glBufferSubData(GL_ARRAY_BUFFER, start*4*sizeof(float), count*4*sizeof(float), data);
-                    glBindBuffer(GL_ARRAY_BUFFER, 0);
-                    registerGLBufferObject(m_lenVbo, &m_cuda_lenvbo_resource);
-                }
-		else
-		    copyArrayToDevice(m_cudaLenVBO, data, start*4*sizeof(float), count*4*sizeof(float));
-            }
+            copyArrayToDevice(m_dLen, data, start*4*sizeof(float), count*4*sizeof(float));
             break;
     }
 }

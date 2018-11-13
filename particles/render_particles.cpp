@@ -28,13 +28,11 @@
 
 ParticleRenderer::ParticleRenderer()
     : m_pos(0),
-      m_len(0),
       m_numParticles(0),
       m_pointSize(1.0f),
       m_particleRadius(0.125f * 0.5f),
       m_program(0),
       m_vbo(0),
-      m_lenvbo(0),
       m_colorVBO(0)
 {
     _initGL();
@@ -43,18 +41,11 @@ ParticleRenderer::ParticleRenderer()
 ParticleRenderer::~ParticleRenderer()
 {
     m_pos = 0;
-    m_len = 0;
 }
 
 void ParticleRenderer::setPositions(float *pos, int numParticles)
 {
     m_pos = pos;
-    m_numParticles = numParticles;
-}
-
-void ParticleRenderer::setLengths(float *len, int numParticles)
-{
-    m_len = len;
     m_numParticles = numParticles;
 }
 
@@ -64,36 +55,10 @@ void ParticleRenderer::setVertexBuffer(unsigned int vbo, int numParticles)
     m_numParticles = numParticles;
 }
 
-void ParticleRenderer::setLengthsBuffer(unsigned int lenvbo, int numParticles)
-{
-    // TODO: find a way to set a zipped pos + len buffer
-    m_lenvbo = lenvbo;
-    //unsigned int m_comb_vbo = createVBO(sizeof(float) * 6 * numParticles);
-    m_numParticles = numParticles;
-}
-
 void ParticleRenderer::_drawPoints()
 {
     if (!m_vbo)
     {
-        glLineWidth(1);
-        glColor3f(0.0f, 0.0f, 0.0f);
-        glBegin(GL_LINES);
-        {
-            int m = 0;
-
-            for (int i = 0; i < m_numParticles; ++i)
-            {
-                if(m_len[m] != -1)
-                {
-                    glVertex3fv(&m_len[m]);
-                    glVertex3fv(&m_pos[m]);
-                    m += 4;
-                }
-            }
-        }
-        glEnd();
-
         glColor3f(1, 1, 1);
         glPointSize(m_pointSize);
         glBegin(GL_POINTS);
@@ -110,31 +75,6 @@ void ParticleRenderer::_drawPoints()
     }
     else
     {
-// **** WILL NOTT WORK CORRECTLY
-/*        if(m_lenvbo)
-        {
-            glBindBuffer(GL_ARRAY_BUFFER, m_lenvbo);
-            glVertexPointer(3, GL_FLOAT, 0, 0);
-            glEnableClientState(GL_VERTEX_ARRAY);
-
-            glLineWidth(1);
-            glColor3f(0.0f, 0.0f, 0.0f);
-            glDrawArrays(GL_LINES, 0, 3);
-
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-            glDisableClientState(GL_VERTEX_ARRAY);
-        }
-*/
-        // FROM OPENGL FORUM:
-        // stride = 12 = total size of vertex format
-        // offset for the first attribute = 0
-        // offset for the second attribute = size of of previous attribute
-        // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 12, 0);
-        // glEnableVertexAttribArray(0);
-        // glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 12, 12);
-        // glEnableVertexAttribArray(1);
-        // Draw the object
-// *****
         glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
         glVertexPointer(4, GL_FLOAT, 0, 0);
         glEnableClientState(GL_VERTEX_ARRAY);
