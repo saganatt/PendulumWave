@@ -77,18 +77,18 @@ struct integrate_functor
 	
 	    // tension is not a real force - does not have a fixed direction
 	    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
-	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / lenData.w;// + params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
+	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / lenData.w; + params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
 	    //printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
 		//printf("Velocity before swing: (%f, %f, %f), position: (%f, %f, %f)\n", vel.x, vel.y, vel.z, pos.x, pos.y, pos.z);
 	        vel += normalize(len - pos) * tension_val * deltaTime;
-		//printf("Velocity after swing: (%f, %f, %f)\n", vel.x, vel.y, vel.z);
+		printf("Velocity after swing: (%f, %f, %f)\n", vel.x, vel.y, vel.z);
 	    }
 	    else // pendulum breaks
 	    {
 	        len_len = -1.0f;
-		//printf("Pendulum broke\n");
+		printf("Pendulum broke\n");
 	    }
 	}
 
@@ -141,9 +141,9 @@ struct integrate_functor
 #endif
 
 	float proper_y = powf((powf(len_len, 2.0f) - powf(pos.z, 2.0f)), 1.0f / 2.0f);
-	//printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);
+	printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);
 	//printf("Supposed y for given z: %f\n", proper_y);
-	//printf("Integrated new velocity: %f, %f, %f\n", vel.x, vel.y, vel.z);
+	printf("Integrated new velocity: %f, %f, %f\n", vel.x, vel.y, vel.z);
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);
         thrust::get<1>(t) = make_float4(vel, velData.w);

@@ -89,12 +89,11 @@ int numIterations = 0; // run until exit
 bool useOpenGL = false;
 
 // simulation parameters
-float timestep = 0.01f;
+float timestep = 1.0f;
 float damping = 1.0f;
 float gravity = 0.0003f;
 int iterations = 1;
 int ballr = 10;
-//float particleRadius = 1.0f / 64.0f;
 
 float collideSpring = 0.5f;;
 float collideDamping = 0.02f;;
@@ -104,7 +103,7 @@ float collideAttraction = 0.0f;
 int minOscillations = 10;
 float tCycle = 4800.0f;
 float breakingTension = 10.0f;
-float ropeSpring = 1.0f;
+float ropeSpring = 0.0f;
 
 ParticleSystem *psystem = 0;
 

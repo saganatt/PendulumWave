@@ -77,7 +77,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.globalDamping = 1.0f;
 
     m_params.breakingTension = 10.0f;
-    m_params.ropeSpring = 1.0f;
+    m_params.ropeSpring = 0.0f;
     m_params.minOscillations = 10;
     m_params.tCycle = 4800.0f; // 480.0f * m_params.minOscillations;
 
