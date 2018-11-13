@@ -493,16 +493,18 @@ ParticleSystem::initPendWave()
     float spacingz = spacingx + 2.0f * maxDisplacement;
     float spacingy = m_params.particleRadius * 2.0f + (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations, 2.0f));
 
-    printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
-    printf("Spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
     float startx = spacingx - 1.0f;//-(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
     float starty = 0.0f;//-(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
     float startz = 0.0f;//-(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
+    printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
+    printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
+    printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
     
     for (uint z=0; z<numPart1D; z++)
     {
         for (uint y=0; y<numPart1D; y++)
         {
+	    printf("Next series of pendulums:\n");
             for (uint x=0; x<numPart1D; x++)
             {
                 uint i = (z*numPart1D*numPart1D) + (y*numPart1D) + x;
@@ -524,6 +526,9 @@ ParticleSystem::initPendWave()
                     m_hVel[i*4+1] = 0.0f;
                     m_hVel[i*4+2] = 0.0f;
                     m_hVel[i*4+3] = 0.0f;
+
+		    printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
+		    printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
                 }
             }
         }
