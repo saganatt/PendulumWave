@@ -79,7 +79,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.breakingTension = 10.0f;
     m_params.ropeSpring = 0.0f;
     m_params.minOscillations = 10;
-    m_params.tCycle = 4800.0f; // 480.0f * m_params.minOscillations;
+    m_params.tCycle = 1200.0f; // 480.0f * m_params.minOscillations;
 
     _initialize(numParticles);
 }
@@ -508,7 +508,7 @@ ParticleSystem::initPendWave()
     float tsq = powf(m_params.tCycle, 2.0f);
     float g = -m_params.gravity.y;
     float len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + numPart1D - 1, 2.0f));
-    float maxDisplacement = len / 9.0f; // small angle approximation works for angles <= 1/9 rad
+    float maxDisplacement = len / 6.0f; // small angle approximation works for angles <= 1/9 rad
     float maxDisplacementSq = powf(maxDisplacement, 2.0f);
 
     float spacingx = m_params.particleRadius * 3.0f;

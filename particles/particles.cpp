@@ -101,7 +101,7 @@ float collideShear = 0.1f;
 float collideAttraction = 0.0f;
 
 int minOscillations = 10;
-float tCycle = 4800.0f;
+float tCycle = 1200.0f;
 float breakingTension = 10.0f;
 float ropeSpring = 0.0f;
 

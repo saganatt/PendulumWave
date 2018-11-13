@@ -27,3 +27,7 @@ minOsc = 5
 or
 Tcycle = 4800
 minOsc = 10
+
+l2=Sequence((n,-0.0003*((4800)/(2π(10+n)))^(2)),n,0,15,1)
+maxDisplacement = length / 9
+l3=Sequence((t, 0.194537*sin(2π*(1/480)t)), t, 0, 10, 1)
