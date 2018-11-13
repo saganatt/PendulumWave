@@ -519,7 +519,7 @@ ParticleSystem::initPendWave()
 
                     m_hPos[i*4] = m_hLen[i*4];
                     m_hPos[i*4+1] = m_hLen[i*4+1] - powf(powf(len, 2.0f) - maxDisplacementSq, 1.0f / 2.0f);
-                    m_hPos[i*4+2] = m_hLen[i*4+1] + maxDisplacement;
+                    m_hPos[i*4+2] = m_hLen[i*4+2] + maxDisplacement;
                     m_hPos[i*4+3] = 1.0f;
 
                     m_hVel[i*4] = 0.0f;
