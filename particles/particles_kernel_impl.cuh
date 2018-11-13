@@ -81,7 +81,7 @@ struct integrate_functor
             float velsq = powf(vel_val, 2.0f);
 	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / len_len;
             float spring_val = params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
-	    printf("Length: %f Evaluated tension: %f delta_pos: %f, velsq:%f\n", len_len, tension_val, delta_pos, velsq);
+	    printf("Length: %f Evaluated tension: %f delta_pos: %f, len.y: %f, pos.y: %f\n", len_len, tension_val, delta_pos, len.y, pos.y);
             //printf("Evaluated rope spring: %f\n", spring_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
