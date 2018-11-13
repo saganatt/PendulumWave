@@ -64,10 +64,10 @@ void ParticleRenderer::setVertexBuffer(unsigned int vbo, int numParticles)
     m_numParticles = numParticles;
 }
 
-void ParticleRenderer::setLengthsBuffer(unsigned int lenvbo, unsigned int vbo, int numParticles)
+void ParticleRenderer::setLengthsBuffer(unsigned int lenvbo, int numParticles)
 {
     // TODO: find a way to set a zipped pos + len buffer
-    m_vbo = vbo;
+    m_lenvbo = lenvbo;
     //unsigned int m_comb_vbo = createVBO(sizeof(float) * 6 * numParticles);
     m_numParticles = numParticles;
 }
@@ -111,7 +111,7 @@ void ParticleRenderer::_drawPoints()
     else
     {
 // **** WILL NOTT WORK CORRECTLY
-        if(m_lenvbo)
+/*        if(m_lenvbo)
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_lenvbo);
             glVertexPointer(3, GL_FLOAT, 0, 0);
@@ -124,7 +124,7 @@ void ParticleRenderer::_drawPoints()
             glBindBuffer(GL_ARRAY_BUFFER, 0);
             glDisableClientState(GL_VERTEX_ARRAY);
         }
-
+*/
         // FROM OPENGL FORUM:
         // stride = 12 = total size of vertex format
         // offset for the first attribute = 0

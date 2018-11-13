@@ -77,7 +77,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.globalDamping = 1.0f;
 
     m_params.breakingTension = 10.0f;
-    m_params.ropeSpring = 8.0f;
+    m_params.ropeSpring = 1.0f;
     m_params.minOscillations = 10;
     m_params.tCycle = 4800.0f; // 480.0f * m_params.minOscillations;
 
@@ -502,18 +502,21 @@ ParticleSystem::initGrid(uint *size, float spacing, float jitter, uint numPartic
 void
 ParticleSystem::initPendWave()
 {
+    uint numPart1D = (int) ceilf(powf((float) m_numParticles, 1.0f / 3.0f));
+
     float pisq = powf(CUDART_PI_F, 2.0f);
     float tsq = powf(m_params.tCycle, 2.0f);
     float g = -m_params.gravity.y;
-    float len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + m_numParticles - 1, 2.0f));
-    float maxDisplacement = len / 6.0f; // small angle approximation works for angles <= 1/9 rad
+    float len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + numPart1D - 1, 2.0f));
+    float maxDisplacement = len / 9.0f; // small angle approximation works for angles <= 1/9 rad
     float maxDisplacementSq = powf(maxDisplacement, 2.0f);
 
     float spacingx = m_params.particleRadius * 3.0f;
-    float spacingz = spacingx + 2.0f * maxDisplacement;
-    float spacingy = m_params.particleRadius * 2.0f + (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations, 2.0f));
+    float spacingz = spacingx + 4.0f * maxDisplacement;
+    float spacingy = m_params.particleRadius * 4.0f + (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations, 2.0f));
 
-    uint numPart1D = (int) ceilf(powf((float) m_numParticles, 1.0f / 3.0f));
+    printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
+    printf("Spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
     float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
     float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
     float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
@@ -528,15 +531,15 @@ ParticleSystem::initPendWave()
 
                 if (i < m_numParticles)
                 {
-                    len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + i, 2.0f));
+                    len = (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations + x, 2.0f));
 		    m_hLen[i*4] = (spacingx * x) + startx;
 		    m_hLen[i*4+1] = (spacingy * y) + starty;
 		    m_hLen[i*4+2] = (spacingz * z) + startz;
 		    m_hLen[i*4+3] = len;
 
                     m_hPos[i*4] = m_hLen[i*4];
-                    m_hPos[i*4+1] = -powf(powf(len, 2.0f) - maxDisplacementSq, 1.0f / 2.0f);
-                    m_hPos[i*4+2] = maxDisplacement;
+                    m_hPos[i*4+1] = m_hLen[i*4+1] - powf(powf(len, 2.0f) - maxDisplacementSq, 1.0f / 2.0f);
+                    m_hPos[i*4+2] = m_hLen[i*4+1] + maxDisplacement;
                     m_hPos[i*4+3] = 1.0f;
 
                     m_hVel[i*4] = 0.0f;
@@ -580,8 +583,8 @@ ParticleSystem::initNewton()
 
                     if(x == 0) // The pendulum that starts the craddle
                     {
-                        m_hPos[i*4] = len / 6.0f;
-                        m_hPos[i*4+1] = m_hLen[i*4+1] - powf(lensq + powf(m_hPos[i*4], 2.0f), 1.0f / 2.0f);
+                        m_hPos[i*4] = len / 9.0f;
+                        m_hPos[i*4+1] = m_hLen[i*4+1] - powf(lensq - powf(m_hPos[i*4], 2.0f), 1.0f / 2.0f);
                     }
                     else
                     {
@@ -631,7 +634,7 @@ ParticleSystem::reset(ParticleConfig config)
 		    m_hLen[l++] = -1.0f;
                 }
 
-                isColliding = true;
+                m_params.isColliding = true;
             }
             break;
 
@@ -642,21 +645,21 @@ ParticleSystem::reset(ParticleConfig config)
                 uint gridSize[3];
                 gridSize[0] = gridSize[1] = gridSize[2] = s;
                 initGrid(gridSize, m_params.particleRadius*2.0f, jitter, m_numParticles);
-                isColliding = true;
+                m_params.isColliding = true;
             }
             break;
 
 	case CONFIG_PEND:
 	    {
                 initPendWave();
-                isColliding = false;
+                m_params.isColliding = false;
 	    }
 	    break;
 
 	case CONFIG_NEWTON:
 	    {
                 initNewton();
-                isColliding = false;
+                m_params.isColliding = false;
 	    }
 	    break;
     }

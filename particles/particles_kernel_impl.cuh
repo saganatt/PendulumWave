@@ -55,13 +55,13 @@ struct integrate_functor
         float3 vel = make_float3(velData.x, velData.y, velData.z);
         float3 len = make_float3(lenData.x, lenData.y, lenData.z);
 	float len_len = lenData.w;
-	printf("Pendulum length: %f\n", len_len);
+	//printf("Pendulum length: %f\n", len_len);
 
 	// TODO: consider user trying to stretch the pendulum with the cursor
         // TODO: does it choose the proper particle? Does it move it too slowly?
         //       bigger tolerance? 2 x r?
         // Additional fields to choose a particle on mouse down and move it all the time on mouse move?
-        if(!params.isColliding && length(pos - params.colliderPos) <= params.particleRadius)
+        /*if(!params.isColliding && length(pos - params.colliderPos) <= params.particleRadius)
         {
             pos.x = params.colliderPos.x;
             pos.y = params.colliderPos.y;
@@ -69,7 +69,7 @@ struct integrate_functor
             vel.x = 0.0f;
             vel.y = 0.0f;
             vel.z = 0.0f;
-        }
+        }*/
 
 	if(len_len != -1.0f) // if a pendulum
 	{
@@ -77,7 +77,7 @@ struct integrate_functor
 	
 	    // tension is not a real force - does not have a fixed direction
 	    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
-	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / lenData.w + params.ropeSpring * (length(pos - len) - len_len);
+	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / lenData.w;// + params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
 	    //printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
@@ -99,9 +99,9 @@ struct integrate_functor
         pos += vel * deltaTime;
 
         // set this to zero to disable collisions with cube sides
-//#if 1
-        if(len_len == -1)
-        {
+#if 0
+        //if(len_len == -1)
+        //{
             if (pos.x > 1.0f - params.particleRadius)
             {
                 pos.x = 1.0f - params.particleRadius;
@@ -131,14 +131,14 @@ struct integrate_functor
                 pos.z = -1.0f + params.particleRadius;
                 vel.z *= params.boundaryDamping;
             }
-    //#endif
 
             if (pos.y < -1.0f + params.particleRadius)
             {
                 pos.y = -1.0f + params.particleRadius;
                 vel.y *= params.boundaryDamping;
             }
-        }
+        //}
+#endif
 
 	float proper_y = powf((powf(len_len, 2.0f) - powf(pos.z, 2.0f)), 1.0f / 2.0f);
 	//printf("Integrated new position: %f, %f, %f\n", pos.x, pos.y, pos.z);

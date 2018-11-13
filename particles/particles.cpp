@@ -89,7 +89,7 @@ int numIterations = 0; // run until exit
 bool useOpenGL = false;
 
 // simulation parameters
-float timestep = 1.0f;
+float timestep = 0.01f;
 float damping = 1.0f;
 float gravity = 0.0003f;
 int iterations = 1;
@@ -101,10 +101,10 @@ float collideDamping = 0.02f;;
 float collideShear = 0.1f;
 float collideAttraction = 0.0f;
 
-int minOscillations = 50;
-float tCycle = 6000.0f;
+int minOscillations = 10;
+float tCycle = 4800.0f;
 float breakingTension = 10.0f;
-float ropeSpring = 8.0f;
+float ropeSpring = 1.0f;
 
 ParticleSystem *psystem = 0;
 
@@ -270,7 +270,7 @@ void display()
         if (renderer)
         {
             renderer->setVertexBuffer(psystem->getCurrentReadBuffer(), psystem->getNumParticles());
-            renderer->setLengthsBuffer(psystem->getCurrentLenReadBuffer(), psystem->getCurrentReadBuffer(), psystem->getNumParticles());
+            renderer->setLengthsBuffer(psystem->getCurrentLenReadBuffer(), psystem->getNumParticles());
         }
     }
 
@@ -533,7 +533,7 @@ void key(unsigned char key, int /*x*/, int /*y*/)
             if (renderer)
             {
                 renderer->setVertexBuffer(psystem->getCurrentReadBuffer(), psystem->getNumParticles());
-                renderer->setLengthsBuffer(psystem->getCurrentLenReadBuffer(), psystem->getCurrentReadBuffer(), psystem->getNumParticles());
+                renderer->setLengthsBuffer(psystem->getCurrentLenReadBuffer(), psystem->getNumParticles());
             }
 
             break;
@@ -688,7 +688,7 @@ void initParams()
     {
         // create a new parameter list
         params = new ParamListGL("misc");
-        params->AddParam(new Param<float>("time step", timestep, 0.0f, 5.0f, 0.01f, &timestep));
+        params->AddParam(new Param<float>("time step", timestep, 0.0f, 1.0f, 0.01f, &timestep));
         params->AddParam(new Param<float>("damping"  , damping , 0.0f, 1.0f, 0.001f, &damping));
         params->AddParam(new Param<float>("gravity"  , gravity , 0.0f, 0.01f, 0.0001f, &gravity));
         params->AddParam(new Param<int> ("ball radius", ballr , 1, 20, 1, &ballr));
