@@ -143,7 +143,7 @@ struct integrate_functor
 #endif
 
 	float proper_y = powf((powf(len_len, 2.0f) - powf(pos.z, 2.0f)), 1.0f / 2.0f);
-	printf("Length %f Integrated new position: %f, %f, %f\n", len_len, pos.x, pos.y, pos.z);
+	printf("Lengths: (%f, %f, %f) Integrated new position: (%f, %f, %f)\n", len.x, len.y, len.z, pos.x, pos.y, pos.z);
 	//printf("Supposed y for given z: %f\n", proper_y);
 	//printf("Length %f Integrated new velocity: %f, %f, %f\n", len_len, vel.x, vel.y, vel.z);
         // store new position and velocity
@@ -292,7 +292,7 @@ float3 collideSpheres(float3 posA, float3 posB,
 
         // relative tangential velocity
         float3 tanVel = relVel - (dot(relVel, norm) * norm);
-
+/*
         // spring force
         force = -params.spring*(collideDist - dist) * norm;
         // dashpot (damping) force
@@ -300,7 +300,7 @@ float3 collideSpheres(float3 posA, float3 posB,
         // tangential shear force
         force += params.shear*tanVel;
         // attraction
-        force += attraction*relPos;
+        force += attraction*relPos;*/
     }
 
     return force;

@@ -66,7 +66,8 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     //    m_params.cellSize = make_float3(worldSize.x / m_gridSize.x, worldSize.y / m_gridSize.y, worldSize.z / m_gridSize.z);
     float cellSize = m_params.particleRadius * 2.0f;  // cell size equal to particle diameter
     m_params.cellSize = make_float3(cellSize, cellSize, cellSize);
-
+    
+    // TODO: What is necessary for a perfectly elastic collision? (Newton craddle case)
     m_params.spring = 0.5f;
     m_params.damping = 0.02f;
     m_params.shear = 0.1f;
@@ -100,18 +101,7 @@ ParticleSystem::createVBO(uint size)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     return vbo;
 }
-/*
-uint
-ParticleSystem::createLenVBO(uint size, )
-{
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, size, 0, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    return vbo;
-}
-*/
+
 inline float lerp(float a, float b, float t)
 {
     return a + t*(b-a);
@@ -540,9 +530,9 @@ ParticleSystem::initPendWave()
 void
 ParticleSystem::initNewton()
 {
-    float len = 1.0f;
+    float len = 0.1f;
     float lensq = powf(len, 2.0f);
-    float spacingx = m_params.particleRadius * 2.0f;
+    float spacingx = m_params.particleRadius * 2.0f; // + a small amount so as bobs do not touch each other initially?
     float spacingy = m_params.particleRadius * 2.0f + len;
     float spacingz = spacingx;
 
@@ -551,10 +541,15 @@ ParticleSystem::initNewton()
     float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
     float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
     
+    printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
+    printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
+    printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
+
     for (uint z=0; z<numPart1D; z++)
     {
         for (uint y=0; y<numPart1D; y++)
         {
+	    printf("Next series of pendulums:\n");
             for (uint x=0; x<numPart1D; x++)
             {
                 uint i = (z*numPart1D*numPart1D) + (y*numPart1D) + x;
@@ -568,7 +563,7 @@ ParticleSystem::initNewton()
 
                     if(x == 0) // The pendulum that starts the craddle
                     {
-                        m_hPos[i*4] = len / 9.0f;
+                        m_hPos[i*4] = m_hLen[i*4] - len / 9.0f;
                         m_hPos[i*4+1] = m_hLen[i*4+1] - powf(lensq - powf(m_hPos[i*4], 2.0f), 1.0f / 2.0f);
                     }
                     else
@@ -583,6 +578,9 @@ ParticleSystem::initNewton()
                     m_hVel[i*4+1] = 0.0f;
                     m_hVel[i*4+2] = 0.0f;
                     m_hVel[i*4+3] = 0.0f;
+
+		    printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
+		    printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
                 }
             }
         }
