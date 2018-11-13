@@ -77,9 +77,11 @@ struct integrate_functor
 	
 	    // tension is not a real force - does not have a fixed direction
 	    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
+            float delta_pos = len.y - pos.y;
+            float velsq = powf(vel_val, 2.0f);
 	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / len_len;
             float spring_val = params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
-	    printf("Length: %f Evaluated tension: %f\n", len_len, tension_val);
+	    printf("Length: %f Evaluated tension: %f delta_pos: %f, velsq:%f\n", len_len, tension_val, delta_pos, velsq);
             //printf("Evaluated rope spring: %f\n", spring_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
