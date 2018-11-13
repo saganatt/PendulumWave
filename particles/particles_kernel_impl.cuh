@@ -55,7 +55,7 @@ struct integrate_functor
         float3 vel = make_float3(velData.x, velData.y, velData.z);
         float3 len = make_float3(lenData.x, lenData.y, lenData.z);
 	float len_len = lenData.w;
-	//printf("Pendulum length: %f\n", len_len);
+	printf("Pendulum length: %f\n", len_len);
 
 	// TODO: consider user trying to stretch the pendulum with the cursor
         // TODO: does it choose the proper particle? Does it move it too slowly?
@@ -78,7 +78,7 @@ struct integrate_functor
 	    // tension is not a real force - does not have a fixed direction
 	    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
 	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / lenData.w; + params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
-	    //printf("Evaluated tension: %f\n", tension_val);
+	    printf("Evaluated tension: %f\n", tension_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
 		//printf("Velocity before swing: (%f, %f, %f), position: (%f, %f, %f)\n", vel.x, vel.y, vel.z, pos.x, pos.y, pos.z);
