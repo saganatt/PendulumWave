@@ -490,14 +490,14 @@ ParticleSystem::initPendWave()
     float maxDisplacementSq = powf(maxDisplacement, 2.0f);
 
     float spacingx = m_params.particleRadius * 3.0f;
-    float spacingz = spacingx + 4.0f * maxDisplacement;
-    float spacingy = m_params.particleRadius * 4.0f + (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations, 2.0f));
+    float spacingz = spacingx + 2.0f * maxDisplacement;
+    float spacingy = m_params.particleRadius * 2.0f + (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations, 2.0f));
 
     printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
     printf("Spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
-    float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
-    float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
-    float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
+    float startx = spacingx - 1.0f;//-(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
+    float starty = 0.0f;//-(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
+    float startz = 0.0f;//-(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
     
     for (uint z=0; z<numPart1D; z++)
     {
