@@ -55,7 +55,7 @@ struct integrate_functor
         float3 vel = make_float3(velData.x, velData.y, velData.z);
         float3 len = make_float3(lenData.x, lenData.y, lenData.z);
 	float len_len = lenData.w;
-	printf("Pendulum length: %f\n", len_len);
+	//printf("Pendulum length: %f\n", len_len);
 
 	// TODO: consider user trying to stretch the pendulum with the cursor
         // TODO: does it choose the proper particle? Does it move it too slowly?
@@ -77,17 +77,15 @@ struct integrate_functor
 	
 	    // tension is not a real force - does not have a fixed direction
 	    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
-            float delta_pos = len.y - pos.y;
-            float velsq = powf(vel_val, 2.0f);
 	    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / len_len;
             float spring_val = params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
-	    printf("Length: %f Evaluated tension: %f delta_pos: %f, len.y: %f, pos.y: %f\n", len_len, tension_val, delta_pos, len.y, pos.y);
+	    //printf("Length: %f Evaluated tension: %f delta_pos: %f, len.y: %f, pos.y: %f\n", len_len, tension_val, delta_pos, len.y, pos.y);
             //printf("Evaluated rope spring: %f\n", spring_val);
 	    if(tension_val < params.breakingTension) // still attached
 	    {
 		//printf("Velocity before swing: (%f, %f, %f), position: (%f, %f, %f)\n", vel.x, vel.y, vel.z, pos.x, pos.y, pos.z);
 	        vel += normalize(len - pos) * tension_val * deltaTime;
-		printf("Length: %f Velocity after swing: (%f, %f, %f)\n", len_len, vel.x, vel.y, vel.z);
+		//printf("Length: %f Velocity after swing: (%f, %f, %f)\n", len_len, vel.x, vel.y, vel.z);
 	    }
 	    else // pendulum breaks
 	    {
@@ -147,7 +145,7 @@ struct integrate_functor
 	float proper_y = powf((powf(len_len, 2.0f) - powf(pos.z, 2.0f)), 1.0f / 2.0f);
 	printf("Length %f Integrated new position: %f, %f, %f\n", len_len, pos.x, pos.y, pos.z);
 	//printf("Supposed y for given z: %f\n", proper_y);
-	printf("Length %f Integrated new velocity: %f, %f, %f\n", len_len, vel.x, vel.y, vel.z);
+	//printf("Length %f Integrated new velocity: %f, %f, %f\n", len_len, vel.x, vel.y, vel.z);
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);
         thrust::get<1>(t) = make_float4(vel, velData.w);
