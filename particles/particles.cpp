@@ -90,12 +90,12 @@ bool useOpenGL = false;
 
 // simulation parameters
 float timestep = 1.0f;
-float damping = 0.0f;//1.0f;
+float damping = 1.0f;
 float gravity = 0.0003f;
 int iterations = 1;
 int ballr = 10;
 
-float collideSpring = 0.0f;//0.5f;
+float collideSpring = 0.5f;
 float collideDamping = 0.0f;//0.02f;
 float collideShear = 0.0f;//0.1f;
 float collideAttraction = 0.0f;
@@ -200,6 +200,10 @@ void runBenchmark(int iterations, char *exec_path)
     {
 	printf("Benchmark iteration %d\n", i);
         psystem->update(timestep);
+	float3 p = psystem->getColliderPos();
+	p.x += 0.1f;
+	p.y += 0.1f;
+        psystem->setColliderPos(p);
     }
 
     cudaDeviceSynchronize();
