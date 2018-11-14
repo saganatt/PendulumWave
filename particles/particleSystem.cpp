@@ -68,14 +68,14 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.cellSize = make_float3(cellSize, cellSize, cellSize);
     
     // TODO: What is necessary for a perfectly elastic collision? (Newton craddle case)
-    m_params.spring = 0.5f;
-    m_params.damping = 0.02f;
-    m_params.shear = 0.1f;
+    m_params.spring = 0.0f;//0.5f;
+    m_params.damping = 0.0f;//0.02f;
+    m_params.shear = 0.0f;//0.1f;
     m_params.attraction = 0.0f;
-    m_params.boundaryDamping = -0.5f;
+    m_params.boundaryDamping = 0.0f;//-0.5f;
 
     m_params.gravity = make_float3(0.0f, -0.0003f, 0.0f);
-    m_params.globalDamping = 1.0f;
+    m_params.globalDamping = 0.0f;//1.0f;
 
     m_params.breakingTension = 10.0f;
     m_params.ropeSpring = 0.0f;
