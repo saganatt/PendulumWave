@@ -80,7 +80,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.breakingTension = 10.0f;
     m_params.ropeSpring = 0.0f;
     m_params.minOscillations = 10;
-    m_params.tCycle = 1200.0f; // 480.0f * m_params.minOscillations;
+    m_params.tCycle = 8000.0f;
 
     _initialize(numParticles);
 }
@@ -488,15 +488,15 @@ ParticleSystem::initPendWave()
     float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
     float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
     float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
-    printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
-    printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
-    printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
+    //printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
+    //printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
+    //printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
     
     for (uint z=0; z<numPart1D; z++)
     {
         for (uint y=0; y<numPart1D; y++)
         {
-	    printf("Next series of pendulums:\n");
+	    //printf("Next series of pendulums:\n");
             for (uint x=0; x<numPart1D; x++)
             {
                 uint i = (z*numPart1D*numPart1D) + (y*numPart1D) + x;
@@ -519,8 +519,8 @@ ParticleSystem::initPendWave()
                     m_hVel[i*4+2] = 0.0f;
                     m_hVel[i*4+3] = 0.0f;
 
-		    printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
-		    printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
+		    //printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
+		    //printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
                 }
             }
         }
@@ -530,27 +530,27 @@ ParticleSystem::initPendWave()
 void
 ParticleSystem::initNewton()
 {
-    float len = 0.1f;
+    float len = 1.0f;
     float lensq = powf(len, 2.0f);
-    float spacingx = m_params.particleRadius * 2.0f; // + a small amount so as bobs do not touch each other initially?
+    float spacingx = m_params.particleRadius * 2.1f; // + a small amount so as bobs do not touch each other initially?
     float spacingy = m_params.particleRadius * 2.0f + len;
-    float spacingz = spacingx;
+    float spacingz = spacingx * 2.0f;
 
     uint numPart1D = (int) ceilf(powf((float) m_numParticles, 1.0f / 3.0f));
     float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
     float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
     float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
     
-    printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
-    printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
-    printf("partcle radius: %f\n", m_params.particleRadius);
-    printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
+    //printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
+    //printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
+    //printf("partcle radius: %f\n", m_params.particleRadius);
+    //printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
 
     for (uint z=0; z<numPart1D; z++)
     {
         for (uint y=0; y<numPart1D; y++)
         {
-	    printf("Next series of pendulums:\n");
+	    //printf("Next series of pendulums:\n");
             for (uint x=0; x<numPart1D; x++)
             {
                 uint i = (z*numPart1D*numPart1D) + (y*numPart1D) + x;
@@ -562,7 +562,7 @@ ParticleSystem::initNewton()
 		    m_hLen[i*4+2] = (spacingz * z) + startz;
 		    m_hLen[i*4+3] = len;
 
-                    if(x == 0) // Pendulum that starts the craddle
+                    if(x <= 0) // Pendulum that starts the craddle
                     {
                         m_hPos[i*4] = m_hLen[i*4] - len / 9.0f;
                         m_hPos[i*4+1] = m_hLen[i*4+1] - powf(lensq - powf(m_hPos[i*4] - m_hLen[i*4], 2.0f), 1.0f / 2.0f);
@@ -580,8 +580,8 @@ ParticleSystem::initNewton()
                     m_hVel[i*4+2] = 0.0f;
                     m_hVel[i*4+3] = 0.0f;
 
-		    printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
-		    printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
+		    //printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
+		    //printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
                 }
             }
         }

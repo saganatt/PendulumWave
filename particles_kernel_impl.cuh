@@ -57,9 +57,6 @@ struct integrate_functor
 	float len_len = lenData.w;
 	//printf("Pendulum length: %f\n", len_len);
 
-	// TODO: consider user trying to stretch the pendulum with the cursor
-        // TODO: does it choose the proper particle? Does it move it too slowly?
-        //       bigger tolerance? 2 x r?
         // Additional fields to choose a particle on mouse down and move it all the time on mouse move?
 	float3 dist = pos - params.colliderPos;
 	//printf("Distance to cursor: (%f, %f, %f)\n", dist.x, dist.y, dist.z);
@@ -73,8 +70,8 @@ struct integrate_functor
             vel.y = 0.0f;
             vel.z = 0.0f;
         }
-	else
-	{
+	//else
+	//{
 		if(len_len != -1.0f) // if a pendulum
 		{
 		    float vel_val = length(vel);
@@ -91,7 +88,7 @@ struct integrate_functor
 		    else // pendulum breaks
 		    {
 			len_len = -1.0f;
-			printf("Length: %f Pendulum broke\n", len_len);
+			//printf("Length: %f Pendulum broke\n", len_len);
 		    }
 		}
 
@@ -102,9 +99,9 @@ struct integrate_functor
 		pos += vel * deltaTime;
 
 		// set this to zero to disable collisions with cube sides
-	#if 0
-		//if(len_len == -1)
-		//{
+	//#if 0
+		if(len_len == -1)
+		{
 		    if (pos.x > 1.0f - params.particleRadius)
 		    {
 			pos.x = 1.0f - params.particleRadius;
@@ -140,9 +137,9 @@ struct integrate_functor
 			pos.y = -1.0f + params.particleRadius;
 			vel.y *= params.boundaryDamping;
 		    }
-		//}
-	#endif
-	}
+		}
+	//#endif
+	//}
 
 	//float proper_y = len.y - powf((powf(len_len, 2.0f) - powf(pos.x - len.x, 2.0f)), 1.0f / 2.0f);
 	//printf("Lengths: (%f, %f, %f) Integrated new position: (%f, %f, %f)\n", len.x, len.y, len.z, pos.x, pos.y, pos.z);

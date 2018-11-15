@@ -101,7 +101,7 @@ float collideShear = 0.0f;//0.1f;
 float collideAttraction = 0.0f;
 
 int minOscillations = 10;
-float tCycle = 1200.0f;
+float tCycle = 8000.0f;
 float breakingTension = 10.0f;
 float ropeSpring = 0.0f;
 
@@ -304,11 +304,11 @@ void display()
     glPushMatrix();
     float3 p = psystem->getColliderPos();
     glTranslatef(p.x, p.y, p.z);
-    if(mode != M_PLE_MOVE)
-    {
+    //if(mode != M_PLE_MOVE)
+    //{
         glColor3f(1.0, 0.0, 0.0);
         glutSolidSphere(psystem->getColliderRadius(), 20, 10);
-    }
+    //}
     glPopMatrix();
 
     if (renderer && displayEnabled)
@@ -554,11 +554,13 @@ void key(unsigned char key, int /*x*/, int /*y*/)
         case 'b':
             mode = M_MOVE;
             psystem->setIsColliding(true);
+	    psystem->setColliderRadius(0.2f);
             break;
 
         case 'm':
             mode = M_PLE_MOVE;
             psystem->setIsColliding(false);
+	    psystem->setColliderRadius(0.1f);
             break;
 
         case 'p':
@@ -702,7 +704,7 @@ void initParams()
         params->AddParam(new Param<int> ("min oscillations", minOscillations, 1, 50, 1, &minOscillations));
         params->AddParam(new Param<float> ("pend wave cycle", tCycle, 0.0f, 10000.0f, 0.1f, &tCycle));
         params->AddParam(new Param<float> ("breaking tension", breakingTension, 0.0f, 100.0f, 0.1f, &breakingTension));
-        params->AddParam(new Param<float> ("rope spring", ropeSpring, 0.0f, 10.0f, 0.1f, &ropeSpring));
+        params->AddParam(new Param<float> ("rope spring", ropeSpring, 0.0f, 2.0f, 0.1f, &ropeSpring));
     }
 }
 

@@ -142,6 +142,10 @@ class ParticleSystem
         {
             m_params.colliderPos = x;
         }
+        void setColliderRadius(float x)
+        {
+            m_params.colliderRadius = x;
+        }
         void setIsColliding(bool b)
         {
             m_params.isColliding = b;
