@@ -55,7 +55,6 @@ struct integrate_functor
         float3 vel = make_float3(velData.x, velData.y, velData.z);
         float3 len = make_float3(lenData.x, lenData.y, lenData.z);
 	float len_len = lenData.w;
-	//printf("Pendulum length: %f\n", len_len);
 
         // Additional fields to choose a particle on mouse down and move it all the time on mouse move?
 	float3 dist = pos - params.colliderPos;
@@ -70,76 +69,76 @@ struct integrate_functor
             vel.y = 0.0f;
             vel.z = 0.0f;
         }
-	//else
-	//{
-		if(len_len != -1.0f) // if a pendulum
-		{
-		    float vel_val = length(vel);
-		    // tension is not a real force - does not have a fixed direction
-		    // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
-		    float spring_val = params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
-		    float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / len_len + spring_val;
-		    //printf("Lengths: (%f, %f, %f) Evaluated tension: %f\n", len.x, len.y, len.z, tension_val);
-		    //printf("Evaluated rope spring: %f\n", spring_val);
-		    if(tension_val < params.breakingTension) // still attached
-		    {
-			vel += normalize(len - pos) * tension_val * deltaTime;
-		    }
-		    else // pendulum breaks
-		    {
-			len_len = -1.0f;
-			//printf("Length: %f Pendulum broke\n", len_len);
-		    }
-		}
+	else
+	{
+            if(len_len != -1.0f) // if a pendulum
+            {
+                float vel_val = length(vel);
+                // tension is not a real force - does not have a fixed direction
+                // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
+                float spring_val = params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
+                float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / len_len + spring_val;
+                //printf("Lengths: (%f, %f, %f) Evaluated tension: %f\n", len.x, len.y, len.z, tension_val);
+                //printf("Evaluated rope spring: %f\n", spring_val);
+                if(tension_val < params.breakingTension) // still attached
+                {
+                    vel += normalize(len - pos) * tension_val * deltaTime;
+                }
+                else // pendulum breaks
+                {
+                    len_len = -1.0f;
+                    //printf("Length: %f Pendulum broke\n", len_len);
+                }
+            }
 
-		vel += params.gravity * deltaTime;
-		vel *= params.globalDamping;
+            vel += params.gravity * deltaTime;
+            vel *= params.globalDamping;
 
-		// new position = old position + velocity * deltaTime
-		pos += vel * deltaTime;
+            // new position = old position + velocity * deltaTime
+            pos += vel * deltaTime;
 
-		// set this to zero to disable collisions with cube sides
-	//#if 0
-		if(len_len == -1)
-		{
-		    if (pos.x > 1.0f - params.particleRadius)
-		    {
-			pos.x = 1.0f - params.particleRadius;
-			vel.x *= params.boundaryDamping;
-		    }
+    // set this to zero to disable collisions with cube sides
+    //#if 0
+            if(len_len == -1)
+            {
+                if (pos.x > 1.0f - params.particleRadius)
+                {
+                    pos.x = 1.0f - params.particleRadius;
+                    vel.x *= params.boundaryDamping;
+                }
 
-		    if (pos.x < -1.0f + params.particleRadius)
-		    {
-			pos.x = -1.0f + params.particleRadius;
-			vel.x *= params.boundaryDamping;
-		    }
+                if (pos.x < -1.0f + params.particleRadius)
+                {
+                    pos.x = -1.0f + params.particleRadius;
+                    vel.x *= params.boundaryDamping;
+                }
 
-		    if (pos.y > 1.0f - params.particleRadius)
-		    {
-			pos.y = 1.0f - params.particleRadius;
-			vel.y *= params.boundaryDamping;
-		    }
+                if (pos.y > 1.0f - params.particleRadius)
+                {
+                    pos.y = 1.0f - params.particleRadius;
+                    vel.y *= params.boundaryDamping;
+                }
 
-		    if (pos.z > 1.0f - params.particleRadius)
-		    {
-			pos.z = 1.0f - params.particleRadius;
-			vel.z *= params.boundaryDamping;
-		    }
+                if (pos.z > 1.0f - params.particleRadius)
+                {
+                    pos.z = 1.0f - params.particleRadius;
+                    vel.z *= params.boundaryDamping;
+                }
 
-		    if (pos.z < -1.0f + params.particleRadius)
-		    {
-			pos.z = -1.0f + params.particleRadius;
-			vel.z *= params.boundaryDamping;
-		    }
+                if (pos.z < -1.0f + params.particleRadius)
+                {
+                    pos.z = -1.0f + params.particleRadius;
+                    vel.z *= params.boundaryDamping;
+                }
 
-		    if (pos.y < -1.0f + params.particleRadius)
-		    {
-			pos.y = -1.0f + params.particleRadius;
-			vel.y *= params.boundaryDamping;
-		    }
-		}
+                if (pos.y < -1.0f + params.particleRadius)
+                {
+                    pos.y = -1.0f + params.particleRadius;
+                    vel.y *= params.boundaryDamping;
+                }
+            }
 	//#endif
-	//}
+	}
 
 	//float proper_y = len.y - powf((powf(len_len, 2.0f) - powf(pos.x - len.x, 2.0f)), 1.0f / 2.0f);
 	//printf("Lengths: (%f, %f, %f) Integrated new position: (%f, %f, %f)\n", len.x, len.y, len.z, pos.x, pos.y, pos.z);
@@ -391,7 +390,6 @@ void collideD(float4 *newVel,               // output: new velocity
     // write new velocity back to original unsorted location
     uint originalIndex = gridParticleIndex[index];
     newVel[originalIndex] = make_float4(vel + force, 0.0f);
-    //printf("newVel after collisions: %f, %f, %f\n", newVel[originalIndex].x, newVel[originalIndex].y, newVel[originalIndex].z);
 }
 
 #endif

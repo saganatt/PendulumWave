@@ -197,7 +197,6 @@ class ParticleSystem
         float *m_hPos;              // particle positions
         float *m_hVel;              // particle velocities
 	float *m_hLen;		    // particle strings positions and lengths (-1 == pendulum broken)
-                                    // TODO: Check if it'd be better to have pends of length 0 on breaking
 
         uint  *m_hParticleHash;
         uint  *m_hCellStart;

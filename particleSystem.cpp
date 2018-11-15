@@ -57,7 +57,7 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     m_params.numCells = m_numGridCells;
     m_params.numBodies = m_numParticles;
 
-    m_params.particleRadius = 1.0f / 64.0f;
+    m_params.particleRadius = 1.0f / 6400.0f;
     m_params.colliderPos = make_float3(-1.2f, -0.8f, 0.8f);
     m_params.colliderRadius = 0.2f;
     m_params.isColliding = false;
@@ -67,12 +67,11 @@ ParticleSystem::ParticleSystem(uint numParticles, uint3 gridSize, bool bUseOpenG
     float cellSize = m_params.particleRadius * 2.0f;  // cell size equal to particle diameter
     m_params.cellSize = make_float3(cellSize, cellSize, cellSize);
     
-    // TODO: What is necessary for a perfectly elastic collision? (Newton craddle case)
     m_params.spring = 0.5f;
-    m_params.damping = 0.0f;//0.02f;
-    m_params.shear = 0.0f;//0.1f;
+    m_params.damping = 0.02f;
+    m_params.shear = 0.1f;
     m_params.attraction = 0.0f;
-    m_params.boundaryDamping = 0.0f;//-0.5f;
+    m_params.boundaryDamping = -0.5f;
 
     m_params.gravity = make_float3(0.0f, -0.0003f, 0.0f);
     m_params.globalDamping = 1.0f;
@@ -392,7 +391,6 @@ ParticleSystem::getArray(ParticleArray array)
     }
 
     copyArrayFromDevice(hdata, ddata, &cuda_vbo_resource, m_numParticles*4*sizeof(float));
-//  for empty vbo it's == checkCudaErrors(cudaMemcpy(hdata, ddata, m_numParticles*4*sizeof(float), cudaMemcpyDeviceToHost));
     return hdata;
 }
 
@@ -481,22 +479,22 @@ ParticleSystem::initPendWave()
     float maxDisplacement = len / 6.0f; // small angle approximation works for angles <= 1/9 rad
     float maxDisplacementSq = powf(maxDisplacement, 2.0f);
 
-    float spacingx = m_params.particleRadius * 3.0f;
+    float spacingx = m_params.particleRadius * 2.5f;
     float spacingz = spacingx + 2.0f * maxDisplacement;
     float spacingy = m_params.particleRadius * 2.0f + (g * tsq) / (4.0f * pisq * powf(m_params.minOscillations, 2.0f));
 
     float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;
     float starty = -(((float) numPart1D - 1.0f) * spacingy) / 2.0f;
     float startz = -(((float) numPart1D - 1.0f) * spacingz) / 2.0f;
-    //printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
-    //printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
-    //printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
+    printf("Num particles: %d, num 1D: %d\n", m_numParticles, numPart1D);
+    printf("spacingx: %f, spacing y: %f, spacing z: %f\n", spacingx, spacingy, spacingz);
+    printf("startx: %f, starty: %f, startz: %f\n", startx, starty, startz);
     
     for (uint z=0; z<numPart1D; z++)
     {
         for (uint y=0; y<numPart1D; y++)
         {
-	    //printf("Next series of pendulums:\n");
+	    printf("Next series of pendulums:\n");
             for (uint x=0; x<numPart1D; x++)
             {
                 uint i = (z*numPart1D*numPart1D) + (y*numPart1D) + x;
@@ -519,8 +517,8 @@ ParticleSystem::initPendWave()
                     m_hVel[i*4+2] = 0.0f;
                     m_hVel[i*4+3] = 0.0f;
 
-		    //printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
-		    //printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
+		    printf("Particle %d positions: (%f, %f, %f)\n", i, m_hPos[i*4], m_hPos[i*4+1], m_hPos[i*4+2]);
+		    printf("Particle %d lengths: (%f, %f, %f)\n", i, m_hLen[i*4], m_hLen[i*4+1], m_hLen[i*4+2]);
                 }
             }
         }
@@ -532,9 +530,9 @@ ParticleSystem::initNewton()
 {
     float len = 1.0f;
     float lensq = powf(len, 2.0f);
-    float spacingx = m_params.particleRadius * 2.1f; // + a small amount so as bobs do not touch each other initially?
+    float spacingx = m_params.particleRadius * 2.0f; // + a small amount so as bobs do not touch each other initially?
     float spacingy = m_params.particleRadius * 2.0f + len;
-    float spacingz = spacingx * 2.0f;
+    float spacingz = spacingx;
 
     uint numPart1D = (int) ceilf(powf((float) m_numParticles, 1.0f / 3.0f));
     float startx = -(((float) numPart1D - 1.0f) * spacingx) / 2.0f;

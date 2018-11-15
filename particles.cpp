@@ -96,8 +96,8 @@ int iterations = 1;
 int ballr = 10;
 
 float collideSpring = 0.5f;
-float collideDamping = 0.0f;//0.02f;
-float collideShear = 0.0f;//0.1f;
+float collideDamping = 0.02f;
+float collideShear = 0.1f;
 float collideAttraction = 0.0f;
 
 int minOscillations = 10;
@@ -134,9 +134,7 @@ extern "C" void copyArrayFromDevice(void *host, const void *device, unsigned int
 void initParticleSystem(int numParticles, uint3 gridSize, bool bUseOpenGL)
 {
     psystem = new ParticleSystem(numParticles, gridSize, bUseOpenGL);
-    //psystem->reset(ParticleSystem::CONFIG_GRID);
-    //psystem->reset(ParticleSystem::CONFIG_PEND);
-    psystem->reset(ParticleSystem::CONFIG_NEWTON);
+    psystem->reset(ParticleSystem::CONFIG_PEND);
 
     if (bUseOpenGL)
     {
@@ -200,10 +198,6 @@ void runBenchmark(int iterations, char *exec_path)
     {
 	printf("Benchmark iteration %d\n", i);
         psystem->update(timestep);
-	float3 p = psystem->getColliderPos();
-	p.x += 0.1f;
-	p.y += 0.1f;
-        psystem->setColliderPos(p);
     }
 
     cudaDeviceSynchronize();
@@ -304,11 +298,8 @@ void display()
     glPushMatrix();
     float3 p = psystem->getColliderPos();
     glTranslatef(p.x, p.y, p.z);
-    //if(mode != M_PLE_MOVE)
-    //{
-        glColor3f(1.0, 0.0, 0.0);
-        glutSolidSphere(psystem->getColliderRadius(), 20, 10);
-    //}
+    glColor3f(1.0, 0.0, 0.0);
+    glutSolidSphere(psystem->getColliderRadius(), 20, 10);
     glPopMatrix();
 
     if (renderer && displayEnabled)
