@@ -58,10 +58,8 @@ struct integrate_functor
 
         // Additional fields to choose a particle on mouse down and move it all the time on mouse move?
 	float3 dist = pos - params.colliderPos;
-	//printf("Distance to cursor: (%f, %f, %f)\n", dist.x, dist.y, dist.z);
         if(!params.isColliding && length(pos - params.colliderPos) <= params.colliderRadius)
         {
-	    printf("Caught a particle at: (%f, %f, %f), colliderPos: (%f, %f, %f)\n", pos.x, pos.y, pos.z, params.colliderPos.x, params.colliderPos.y, params.colliderPos.z);
             pos.x = params.colliderPos.x;
             pos.y = params.colliderPos.y;
             pos.z = params.colliderPos.z;
@@ -69,8 +67,6 @@ struct integrate_functor
             vel.y = 0.0f;
             vel.z = 0.0f;
         }
-	//else
-	//{
             if(len_len != -1.0f) // if a pendulum
             {
                 float vel_val = length(vel);
@@ -78,8 +74,6 @@ struct integrate_functor
                 // magnitude = -mgcos(theta) + mv2 / L = (v2 - g|y2-y0|) / L
                 float spring_val = params.ropeSpring * powf(length(pos - len) - len_len, 2.0f);
                 float tension_val = (-params.gravity.y * (len.y - pos.y) + powf(vel_val, 2.0f)) / len_len + spring_val;
-                //printf("Lengths: (%f, %f, %f) Evaluated tension: %f\n", len.x, len.y, len.z, tension_val);
-                //printf("Evaluated rope spring: %f\n", spring_val);
                 if(tension_val < params.breakingTension) // still attached
                 {
                     vel += normalize(len - pos) * tension_val * deltaTime;
@@ -87,7 +81,6 @@ struct integrate_functor
                 else // pendulum breaks
                 {
                     len_len = -1.0f;
-                    //printf("Length: %f Pendulum broke\n", len_len);
                 }
             }
 
@@ -97,8 +90,8 @@ struct integrate_functor
             // new position = old position + velocity * deltaTime
             pos += vel * deltaTime;
 
-    // set this to zero to disable collisions with cube sides
-    //#if 0
+// set this to zero to disable collisions with cube sides
+//#if 0
             if(len_len == -1)
             {
                 if (pos.x > 1.0f - params.particleRadius)
@@ -137,13 +130,8 @@ struct integrate_functor
                     vel.y *= params.boundaryDamping;
                 }
             }
-	//#endif
-//	}
+//#endif
 
-	//float proper_y = len.y - powf((powf(len_len, 2.0f) - powf(pos.x - len.x, 2.0f)), 1.0f / 2.0f);
-	//printf("Lengths: (%f, %f, %f) Integrated new position: (%f, %f, %f)\n", len.x, len.y, len.z, pos.x, pos.y, pos.z);
-	//printf("Supposed y for given x: %f\n", proper_y);
-	//printf("Lengths: (%f, %f, %f) Integrated new velocity: (%f, %f, %f)\n", len.x, len.y, len.z, vel.x, vel.y, vel.z);
         // store new position and velocity
         thrust::get<0>(t) = make_float4(pos, posData.w);
         thrust::get<1>(t) = make_float4(vel, velData.w);

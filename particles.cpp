@@ -196,7 +196,6 @@ void runBenchmark(int iterations, char *exec_path)
 
     for (int i = 0; i < iterations; ++i)
     {
-	printf("Benchmark iteration %d\n", i);
         psystem->update(timestep);
     }
 
@@ -649,13 +648,6 @@ void idle(void)
     if (demoMode)
     {
         camera_rot[1] += 0.1f;
-/*
-        if (demoCounter++ > 1000)
-        {
-            ballr = 10 + (rand() % 10);
-            addSphere();
-            demoCounter = 0;
-        }*/
     }
 
     glutPostRedisplay();
@@ -806,7 +798,7 @@ main(int argc, char **argv)
     {
         if (numIterations <= 0)
         {
-            numIterations = 10; // 300
+            numIterations = 300
         }
 
         runBenchmark(numIterations, argv[0]);
