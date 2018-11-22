@@ -798,7 +798,7 @@ main(int argc, char **argv)
     {
         if (numIterations <= 0)
         {
-            numIterations = 300
+            numIterations = 300;
         }
 
         runBenchmark(numIterations, argv[0]);
