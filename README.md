@@ -9,3 +9,10 @@ Moreover, Pendulum Wave simulation can be reset with different value of wave cyc
 Newton Craddle implementation is not the ideal one - actually, one would have to consider the whole system of pendulums to process the collisions according to the Law of Conservation of Momentum. That would, however, be impossible in this program, with each thread having information only about single particle.
 
 Enjoy!
+
+<strong>Some pictures:</strong>
+
+![Alt text](img/PendWave_zigzag_front.png?raw=true "Pendulum Wave start")
+![Alt text](img/PendWave_zig_zags.png?raw=true "Pendulum Wave")
+![Alt text](img/PendWave_interleaves.png?raw=true "Pendulum Wave middle")
+![Alt text](img/Newton_init.png?raw=true "Newton craddle start")
